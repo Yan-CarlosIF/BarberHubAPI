@@ -3,7 +3,7 @@ import { AppError } from '@/shared/errors/appError';
 import type { ICreateClientDTO } from '../../dtos/IcreateClientDTO';
 import type { IUserRepository } from '../../repository/IuserRepository';
 
-export class CreateClientUseCase {
+export class RegisterClientUseCase {
 	constructor(private userRepository: IUserRepository) {}
 
 	async execute(data: ICreateClientDTO): Promise<void> {
