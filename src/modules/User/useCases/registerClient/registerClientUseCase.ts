@@ -1,10 +1,15 @@
 import { hash } from 'bcrypt';
+import { inject, injectable } from 'tsyringe';
 import { AppError } from '@/shared/errors/appError';
 import type { ICreateClientDTO } from '../../dtos/IcreateClientDTO';
 import type { IUserRepository } from '../../repository/IuserRepository';
 
+@injectable()
 export class RegisterClientUseCase {
-	constructor(private userRepository: IUserRepository) {}
+	constructor(
+		@inject('UserRepository')
+		private userRepository: IUserRepository,
+	) {}
 
 	async execute(data: ICreateClientDTO): Promise<void> {
 		const userAlreadyExists = await this.userRepository.findByEmail(data.email);
