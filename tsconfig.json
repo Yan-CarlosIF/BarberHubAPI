@@ -17,6 +17,13 @@
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"moduleResolution": "node16"
+		"moduleResolution": "node16",
+		"paths": {
+			"@*": ["./src/*"],
+			"@modules/*": ["./src/modules/*"],
+			"@shared/*": ["./src/shared/*"],
+			"@infra/*": ["./src/infra/*"],
+			"@config/*": ["./src/config/*"]
+		}
 	}
 }

@@ -27,7 +27,6 @@ services:
     command: npm run dev
     volumes:
       - .:/usr/app
-      - .:/usr/app/node_modules
     depends_on:
       - database
       - redis

@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -64,25 +63,23 @@ model User {
   updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   barberShop BarberShop @relation(fields: [barberShopId], references: [id])
-  clients    Client[]
-  barbers    Barber[]
+  client     Client?
+  barber     Barber?
 }
 
 model Client {
   id        String   @id @default(uuid())
-  userId    String   @map("user_id")
+  userId    String   @unique @map("user_id")
   phone     String   @db.VarChar(20)
   birthDate DateTime @map("birth_date") @db.Date
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Barber {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  specialty String?  @db.VarChar(100)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  id        String  @id @default(uuid())
+  userId    String  @unique @map("user_id")
+  specialty String? @db.VarChar(100)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
