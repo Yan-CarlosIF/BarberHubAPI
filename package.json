@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "server.ts",
 	"scripts": {
-		"dev": "tsx watch src/infra/http/server.ts",
+		"dev": "tsx watch src/shared/infra/http/server.ts",
 		"lint": "biome check --write src/",
 		"test": "vitest run",
 		"test:coverage": "vitest run --coverage"
@@ -17,7 +17,10 @@
 		"@prisma/client": "^7.3.0",
 		"bcrypt": "^6.0.0",
 		"cors": "^2.8.6",
-		"express": "^5.2.1"
+		"express": "^5.2.1",
+		"reflect-metadata": "^0.2.2",
+		"tsyringe": "^4.10.0",
+		"zod": "^4.3.6"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.3.14",

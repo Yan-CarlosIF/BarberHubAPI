@@ -1,19 +1,18 @@
 import { AppError } from '@shared/errors/appError';
-import { beforeEach, describe, expect, it } from 'vitest';
 import { UserRepositoryInMemory } from '../../repository/inMemory/userRepositoryInMemory';
-import { CreateClientUseCase } from './createClientUseCase';
+import { RegisterClientUseCase } from './registerClientUseCase';
 
-describe('[POST] /clients', () => {
+describe('[POST] /auth/register', () => {
 	let userRepositoryInMemory: UserRepositoryInMemory;
-	let createClientUseCase: CreateClientUseCase;
+	let registerClientUseCase: RegisterClientUseCase;
 
 	beforeEach(() => {
 		userRepositoryInMemory = new UserRepositoryInMemory();
-		createClientUseCase = new CreateClientUseCase(userRepositoryInMemory);
+		registerClientUseCase = new RegisterClientUseCase(userRepositoryInMemory);
 	});
 
 	it('should be able to create a client', async () => {
-		await createClientUseCase.execute({
+		await registerClientUseCase.execute({
 			email: 'H4t2V@example.com',
 			barberShopId: 'barberShopId',
 			birthDate: new Date(),
@@ -26,10 +25,13 @@ describe('[POST] /clients', () => {
 		expect(userRepositoryInMemory.users).toHaveLength(1);
 		expect(userRepositoryInMemory.clients).toHaveLength(1);
 		expect(userRepositoryInMemory.users[0].email).toBe('H4t2V@example.com');
+		expect(userRepositoryInMemory.clients[0].userId).toBe(
+			userRepositoryInMemory.users[0].id,
+		);
 	});
 
 	it('should not be able to create a client with an existing email', async () => {
-		await createClientUseCase.execute({
+		await registerClientUseCase.execute({
 			email: 'H4t2V@example.com',
 			barberShopId: 'barberShopId',
 			birthDate: new Date(),
@@ -40,7 +42,7 @@ describe('[POST] /clients', () => {
 		});
 
 		await expect(
-			createClientUseCase.execute({
+			registerClientUseCase.execute({
 				email: 'H4t2V@example.com',
 				barberShopId: 'barberShopId',
 				birthDate: new Date(),
