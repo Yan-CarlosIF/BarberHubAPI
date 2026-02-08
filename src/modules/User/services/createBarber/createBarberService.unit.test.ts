@@ -1,18 +1,18 @@
 import { UserRepositoryInMemory } from '@modules/User/repository/inMemory/userRepositoryInMemory';
 import { AppError } from '@shared/errors/appError';
-import { CreateBarberUseCase } from './createBarberUseCase';
+import { CreateBarberService } from './createBarberService';
 
-describe('CreateBarberUseCase', () => {
+describe('CreateBarberService', () => {
 	let userRepositoryInMemory: UserRepositoryInMemory;
-	let createBarberUseCase: CreateBarberUseCase;
+	let createBarberService: CreateBarberService;
 
 	beforeEach(() => {
 		userRepositoryInMemory = new UserRepositoryInMemory();
-		createBarberUseCase = new CreateBarberUseCase(userRepositoryInMemory);
+		createBarberService = new CreateBarberService(userRepositoryInMemory);
 	});
 
 	it('should be able to create a new barber', async () => {
-		await createBarberUseCase.execute({
+		await createBarberService.execute({
 			email: 'barber@example.com',
 			password: '123456',
 			name: 'John Doe',
@@ -31,7 +31,7 @@ describe('CreateBarberUseCase', () => {
 	});
 
 	it('should not be able to create a barber with an email that already exists', async () => {
-		await createBarberUseCase.execute({
+		await createBarberService.execute({
 			email: 'barber@example.com',
 			password: '123456',
 			name: 'John Doe',
@@ -41,7 +41,7 @@ describe('CreateBarberUseCase', () => {
 		});
 
 		await expect(
-			createBarberUseCase.execute({
+			createBarberService.execute({
 				email: 'barber@example.com',
 				password: '123456',
 				name: 'John Doe',

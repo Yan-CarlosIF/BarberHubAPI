@@ -1,13 +1,13 @@
 import type { ICreateBarberDTO } from '@modules/User/dtos/IcreateBarberDTO';
-import type { ICreateClientDTO } from '@modules/User/dtos/IcreateClientDTO';
 import type { ICreateUserDTO } from '@modules/User/dtos/IcreateUserDTO';
+import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
 import type { IUserRepository } from '@modules/User/repository/IuserRepository';
 import { $Enums } from '@prisma/client';
 import { prisma } from '@shared/prisma/client';
 import type { User } from '../entities/User';
 
 export class UserRepositoryPrisma implements IUserRepository {
-	async createClient(data: ICreateClientDTO): Promise<void> {
+	async createClient(data: IRegisterClientDTO): Promise<void> {
 		await prisma.user.create({
 			data: {
 				name: data.name,
@@ -15,6 +15,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 				password: data.password,
 				barberShopId: data.barberShopId,
 				role: $Enums.Role.CLIENT,
+				isActive: data.isActive,
 				client: {
 					create: {
 						phone: data.phone,

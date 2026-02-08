@@ -1,5 +1,5 @@
 import { createBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
-import { registerClientSchema } from '@modules/User/infra/http/controllers/userController';
+import { registerClientSchema } from '@modules/User/dtos/IregisterClientDTO';
 import { createDocument } from 'zod-openapi';
 
 export const openApiDocument = createDocument({
@@ -81,6 +81,22 @@ export const openApiDocument = createDocument({
 									},
 									example: {
 										message: 'Barber shop registered successfully',
+									},
+								},
+							},
+						},
+					},
+					400: {
+						description: 'Email ou telefone já registrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Email already registered',
 									},
 								},
 							},

@@ -1,32 +1,22 @@
-import { RegisterClientUseCase } from '@modules/User/useCases/registerClient/registerClientUseCase';
+import {
+	type IRegisterClientDTO,
+	registerClientSchema,
+} from '@modules/User/dtos/IregisterClientDTO';
+import { RegisterClientService } from '@modules/User/services/registerClient/registerClientService';
 import type { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import z from 'zod';
-
-export const registerClientSchema = z
-	.object({
-		name: z.string(),
-		email: z.email(),
-		password: z.string().min(6),
-		barberShopId: z.uuid(),
-		phone: z.string().regex(/^\(\d{2}\) \d{4,5}-\d{4}$/),
-		birthDate: z.coerce.date(),
-	})
-	.meta({ description: 'Body da requisição para registrar um novo cliente' });
-
-type RegisterClientRequest = z.infer<typeof registerClientSchema>;
 
 export class UserController {
 	public async registerClientHandle(
-		request: Request<unknown, unknown, RegisterClientRequest>,
+		request: Request<unknown, unknown, IRegisterClientDTO>,
 		response: Response,
 	) {
 		const { name, barberShopId, birthDate, email, password, phone } =
 			registerClientSchema.parse(request.body);
 
-		const registerClientUseCase = container.resolve(RegisterClientUseCase);
+		const registerClientService = container.resolve(RegisterClientService);
 
-		await registerClientUseCase.execute({
+		await registerClientService.execute({
 			name,
 			barberShopId,
 			birthDate,

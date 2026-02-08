@@ -1,7 +1,7 @@
 import { $Enums } from '@prisma/client';
 import type { ICreateBarberDTO } from '../../dtos/IcreateBarberDTO';
-import type { ICreateClientDTO } from '../../dtos/IcreateClientDTO';
 import type { ICreateUserDTO } from '../../dtos/IcreateUserDTO';
+import type { IRegisterClientDTO } from '../../dtos/IregisterClientDTO';
 import { Barber } from '../../infra/prisma/entities/Barber';
 import { Client } from '../../infra/prisma/entities/Client';
 import { User } from '../../infra/prisma/entities/User';
@@ -12,7 +12,7 @@ export class UserRepositoryInMemory implements IUserRepository {
 	public barbers: Barber[] = [];
 	public users: User[] = [];
 
-	async createClient(data: ICreateClientDTO): Promise<void> {
+	async createClient(data: IRegisterClientDTO): Promise<void> {
 		const client = new Client(data);
 
 		this.users.push(client.user);
