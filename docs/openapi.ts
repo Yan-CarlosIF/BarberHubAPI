@@ -1,4 +1,5 @@
 import { createBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
+import { LoginSchema } from '@modules/User/dtos/ILoginDTO';
 import { registerClientSchema } from '@modules/User/dtos/IregisterClientDTO';
 import { createDocument } from 'zod-openapi';
 
@@ -50,6 +51,53 @@ export const openApiDocument = createDocument({
 									},
 									example: {
 										message: 'Email already registered',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/auth/login': {
+			post: {
+				summary: 'Login de Usuário',
+				tags: ['User'],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: LoginSchema,
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: 'Autenticação bem-sucedida',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										token: { type: 'string' },
+									},
+									example: {
+										token: 'jwt_token_here',
+									},
+								},
+							},
+						},
+					},
+					401: {
+						description: 'Credenciais inválidas',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Invalid credentials',
 									},
 								},
 							},

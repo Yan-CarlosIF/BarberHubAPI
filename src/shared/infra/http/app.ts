@@ -19,9 +19,6 @@ app.use(
 );
 app.use(express.json());
 
-// Error handling middleware should be registered after all routes and other middleware
-app.use(errorHandler);
-
 // API documentation route
 app.use(
 	'/docs',
@@ -49,3 +46,6 @@ app.get('/health', (_, res) => res.sendStatus(200));
 
 // Register application routes
 app.use(appRoutes);
+
+// Error handling middleware should be registered after all routes and other middleware
+app.use(errorHandler);

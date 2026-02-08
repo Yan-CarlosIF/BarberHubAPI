@@ -1,9 +1,10 @@
 import 'dotenv/config';
+import { env } from '@config/env';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 
-const connectionString = process.env['DATABASE_URL'];
+const connectionString = env.DATABASE_URL;
 
 const adapter = new PrismaPg(new Pool({ connectionString }));
 

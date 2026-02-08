@@ -1,7 +1,7 @@
 import { prisma } from '@shared/prisma/client';
 import { hash } from 'bcrypt';
 
-async function seed() {
+export async function seed() {
 	await prisma.$connect();
 	console.log('Seeding admin user...');
 

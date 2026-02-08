@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import { UserRepositoryInMemory } from '@modules/User/repository/inMemory/userRepositoryInMemory';
 import { AppError } from '@shared/errors/appError';
 import { CreateBarberService } from './createBarberService';

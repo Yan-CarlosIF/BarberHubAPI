@@ -13,6 +13,9 @@ export default defineConfig({
 			provider: 'v8',
 			reporter: ['text', 'html'],
 		},
+		env: {
+			NODE_ENV: 'test',
+		},
 	},
 	resolve: {
 		alias: {
