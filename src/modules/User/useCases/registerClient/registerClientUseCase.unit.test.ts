@@ -1,8 +1,10 @@
+import 'reflect-metadata';
+
 import { AppError } from '@shared/errors/appError';
 import { UserRepositoryInMemory } from '../../repository/inMemory/userRepositoryInMemory';
 import { RegisterClientUseCase } from './registerClientUseCase';
 
-describe('[POST] /auth/register', () => {
+describe('RegisterClientUseCase', () => {
 	let userRepositoryInMemory: UserRepositoryInMemory;
 	let registerClientUseCase: RegisterClientUseCase;
 
@@ -51,6 +53,6 @@ describe('[POST] /auth/register', () => {
 				phone: '123456789',
 				isActive: true,
 			}),
-		).rejects.toEqual(new AppError('User already exists', 400));
+		).rejects.toEqual(new AppError('Email already registered', 400));
 	});
 });

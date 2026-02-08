@@ -27,15 +27,27 @@ model BarberShop {
 
   barberShopOpeningHours BarberShopOpeningHours[]
   users                  User[]
+  clients                Client[]
+  barbers                Barber[]
+}
+
+enum WeekDay {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
 }
 
 model BarberShopOpeningHours {
-  id           String    @id @default(uuid())
-  barberShopId String    @map("barber_shop_id")
-  weekDay      Int       @map("week_day")
-  openTime     DateTime? @map("open_time") @db.Time
-  closeTime    DateTime? @map("close_time") @db.Time
-  isClosed     Boolean   @default(false) @map("is_closed")
+  id           String  @id @default(uuid())
+  barberShopId String  @map("barber_shop_id")
+  weekDay      WeekDay @map("week_day")
+  openTime     String? @db.Char(5)
+  closeTime    String? @db.Char(5)
+  isClosed     Boolean @default(false) @map("is_closed")
 
   barbershop BarberShop @relation(fields: [barberShopId], references: [id], onDelete: Cascade)
 
@@ -52,34 +64,39 @@ enum Role {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  barberShopId String   @map("barber_shop_id")
-  name         String   @db.VarChar(150)
-  email        String   @unique @db.VarChar(255)
-  password     String
-  role         Role     @default(CLIENT)
-  isActive     Boolean  @default(true) @map("is_active")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(150)
+  email     String   @unique @db.VarChar(255)
+  password  String
+  role      Role     @default(CLIENT)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
-  client     Client?
-  barber     Barber?
+  client Client?
+  barber Barber?
+
+  barberShop   BarberShop? @relation(fields: [barberShopId], references: [id])
+  barberShopId String?
 }
 
 model Client {
-  id        String   @id @default(uuid())
-  userId    String   @unique @map("user_id")
-  phone     String   @db.VarChar(20)
-  birthDate DateTime @map("birth_date") @db.Date
+  id           String   @id @default(uuid())
+  barberShopId String   @map("barber_shop_id")
+  userId       String   @unique @map("user_id")
+  phone        String   @db.VarChar(20)
+  birthDate    DateTime @map("birth_date") @db.Date
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Barber {
-  id        String  @id @default(uuid())
-  userId    String  @unique @map("user_id")
-  specialty String? @db.VarChar(100)
+  id           String  @id @default(uuid())
+  barberShopId String  @map("barber_shop_id")
+  userId       String  @unique @map("user_id")
+  specialty    String? @db.VarChar(100)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

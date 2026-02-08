@@ -2,7 +2,7 @@ import { UserRepositoryInMemory } from '@modules/User/repository/inMemory/userRe
 import { AppError } from '@shared/errors/appError';
 import { CreateBarberUseCase } from './createBarberUseCase';
 
-describe('[POST] /barbers', () => {
+describe('CreateBarberUseCase', () => {
 	let userRepositoryInMemory: UserRepositoryInMemory;
 	let createBarberUseCase: CreateBarberUseCase;
 
@@ -49,6 +49,6 @@ describe('[POST] /barbers', () => {
 				isActive: true,
 				specialty: 'Corte de cabelo',
 			}),
-		).rejects.toEqual(new AppError('User already exists', 400));
+		).rejects.toEqual(new AppError('Email already registered', 400));
 	});
 });
