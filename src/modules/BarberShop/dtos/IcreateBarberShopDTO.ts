@@ -5,7 +5,7 @@ export const createBarberShopDTO = z
 		name: z.string(),
 		description: z.string(),
 		email: z.email(),
-		phone: z.string(),
+		phone: z.string().regex(/^\(\d{2}\) \d{4,5}-\d{4}$/),
 		city: z.string(),
 		street: z.string(),
 		state: z.string(),
