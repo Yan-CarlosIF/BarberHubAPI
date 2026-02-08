@@ -5,7 +5,8 @@ export const registerClientSchema = z
 		name: z.string().min(1, 'Nome é obrigatório'),
 		email: z.email('Email inválido'),
 		password: z.string().min(6, 'Senha deve conter pelo menos 6 caracteres'),
-		barberShopId: z.uuid(),
+		barberShopId: z.uuid().nonempty('ID da barbearia é obrigatório'),
+		isActive: z.boolean().optional().default(true),
 		phone: z
 			.string()
 			.regex(
@@ -17,6 +18,4 @@ export const registerClientSchema = z
 	.meta({ description: 'Body da requisição para registrar um novo cliente' });
 
 export interface IRegisterClientDTO
-	extends z.infer<typeof registerClientSchema> {
-	isActive: boolean;
-}
+	extends z.infer<typeof registerClientSchema> {}

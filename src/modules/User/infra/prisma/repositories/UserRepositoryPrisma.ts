@@ -15,7 +15,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 				password: data.password,
 				barberShopId: data.barberShopId,
 				role: $Enums.Role.CLIENT,
-				isActive: data.isActive,
+				isActive: true,
 				client: {
 					create: {
 						phone: data.phone,
@@ -35,6 +35,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 				password: data.password,
 				barberShopId: data.barberShopId,
 				role: $Enums.Role.BARBER,
+				isActive: true,
 				barber: {
 					create: {
 						specialty: data.specialty,
@@ -53,6 +54,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 				password: data.password,
 				barberShopId: data.barberShopId,
 				role: $Enums.Role.ADMIN,
+				isActive: true,
 			},
 		});
 	}

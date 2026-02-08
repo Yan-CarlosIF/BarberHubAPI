@@ -12,10 +12,10 @@ const envSchema = z.object({
 
 function validate() {
 	const parse = envSchema.safeParse({
-		NODE_ENV: process.env['NODE_ENV'],
-		DATABASE_URL: process.env['DATABASE_URL'],
-		REDIS_URL: process.env['REDIS_URL'],
-		JWT_SECRET: process.env['JWT_SECRET'],
+		NODE_ENV: process.env.NODE_ENV,
+		DATABASE_URL: process.env.DATABASE_URL,
+		REDIS_URL: process.env.REDIS_URL,
+		JWT_SECRET: process.env.JWT_SECRET,
 	});
 
 	if (!parse.success) {

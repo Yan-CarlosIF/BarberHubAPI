@@ -3,16 +3,17 @@ import { hash } from 'bcrypt';
 
 export async function seed() {
 	await prisma.$connect();
-	console.log('Seeding admin user...');
+	console.log('Seeding super admin user...');
 
 	const hashedPassword = await hash('hub123', 10);
 
 	await prisma.user.create({
 		data: {
 			email: 'admin@example.com',
-			name: 'Admin User',
-			role: 'ADMIN',
+			name: 'Super Admin',
+			role: 'SUPER_ADMIN',
 			password: hashedPassword,
+			isActive: true,
 		},
 	});
 

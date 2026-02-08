@@ -1,4 +1,5 @@
 import { createBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
+import { createBarberSchema } from '@modules/User/dtos/IcreateBarberDTO';
 import { LoginSchema } from '@modules/User/dtos/ILoginDTO';
 import { registerClientSchema } from '@modules/User/dtos/IregisterClientDTO';
 import { createDocument } from 'zod-openapi';
@@ -12,6 +13,53 @@ export const openApiDocument = createDocument({
 	},
 	servers: [{ url: 'http://localhost:3333', description: 'Local' }],
 	paths: {
+		'/auth/login': {
+			post: {
+				summary: 'Login de Usuário',
+				tags: ['User'],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: LoginSchema,
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: 'Autenticação bem-sucedida',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										token: { type: 'string' },
+									},
+									example: {
+										token: 'jwt_token_here',
+									},
+								},
+							},
+						},
+					},
+					401: {
+						description: 'Credenciais inválidas',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Invalid credentials',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 		'/auth/register': {
 			post: {
 				summary: 'Registrar Cliente',
@@ -59,36 +107,20 @@ export const openApiDocument = createDocument({
 				},
 			},
 		},
-		'/auth/login': {
+		'/users/barbers': {
 			post: {
-				summary: 'Login de Usuário',
+				summary: 'Registrar Barbeiro',
 				tags: ['User'],
 				requestBody: {
 					content: {
 						'application/json': {
-							schema: LoginSchema,
+							schema: createBarberSchema,
 						},
 					},
 				},
 				responses: {
-					200: {
-						description: 'Autenticação bem-sucedida',
-						content: {
-							'application/json': {
-								schema: {
-									type: 'object',
-									properties: {
-										token: { type: 'string' },
-									},
-									example: {
-										token: 'jwt_token_here',
-									},
-								},
-							},
-						},
-					},
-					401: {
-						description: 'Credenciais inválidas',
+					201: {
+						description: 'Barbeiro registrado com sucesso',
 						content: {
 							'application/json': {
 								schema: {
@@ -97,7 +129,23 @@ export const openApiDocument = createDocument({
 										message: { type: 'string' },
 									},
 									example: {
-										message: 'Invalid credentials',
+										message: 'Barber registered successfully',
+									},
+								},
+							},
+						},
+					},
+					400: {
+						description: 'Email já registrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Email already registered',
 									},
 								},
 							},
@@ -154,5 +202,4 @@ export const openApiDocument = createDocument({
 			},
 		},
 	},
-	components: {},
 });

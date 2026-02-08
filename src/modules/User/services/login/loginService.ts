@@ -27,7 +27,15 @@ export class LoginService {
 		}
 
 		const token = sign(
-			{ userId: user.id, role: user.role },
+			{
+				user: {
+					id: user.id,
+					name: user.name,
+					email: user.email,
+					role: user.role,
+					barberShopId: user.barberShopId,
+				},
+			},
 			env.JWT_SECRET,
 			JWT_OPTIONS,
 		);
