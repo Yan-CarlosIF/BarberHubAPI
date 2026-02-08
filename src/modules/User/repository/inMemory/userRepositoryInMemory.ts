@@ -12,24 +12,8 @@ export class UserRepositoryInMemory implements IUserRepository {
 	public barbers: Barber[] = [];
 	public users: User[] = [];
 
-	async createClient({
-		email,
-		barberShopId,
-		birthDate,
-		name,
-		password,
-		phone,
-		isActive,
-	}: ICreateClientDTO): Promise<void> {
-		const client = new Client({
-			email,
-			barberShopId,
-			birthDate,
-			name,
-			password,
-			phone,
-			isActive,
-		});
+	async createClient(data: ICreateClientDTO): Promise<void> {
+		const client = new Client(data);
 
 		this.users.push(client.user);
 		this.clients.push(client);

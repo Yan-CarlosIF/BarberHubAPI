@@ -3,6 +3,7 @@ import { User } from './User';
 
 export class Barber implements BarberType {
 	id: string = crypto.randomUUID();
+	barberShopId: string;
 	specialty: string | null;
 	user: User;
 	userId: string;
@@ -21,10 +22,11 @@ export class Barber implements BarberType {
 			isActive,
 			name,
 			password,
-			barberShopId,
 			role: $Enums.Role.BARBER,
+			barberShopId,
 		});
-		this.userId = this.user.id;
+		this.barberShopId = barberShopId;
 		this.specialty = specialty;
+		this.userId = this.user.id;
 	}
 }

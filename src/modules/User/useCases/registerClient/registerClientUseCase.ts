@@ -15,7 +15,7 @@ export class RegisterClientUseCase {
 		const userAlreadyExists = await this.userRepository.findByEmail(data.email);
 
 		if (userAlreadyExists) {
-			throw new AppError('User already exists', 400);
+			throw new AppError('Email already registered', 400);
 		}
 
 		const hashedPassword = await hash(data.password, 10);

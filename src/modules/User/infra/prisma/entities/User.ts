@@ -2,7 +2,7 @@ import type { $Enums, User as UserType } from '@prisma/client';
 
 export class User implements UserType {
 	id: string = crypto.randomUUID();
-	barberShopId: string;
+	barberShopId: string | null = null;
 	role: $Enums.Role;
 	isActive: boolean = true;
 	name: string;
@@ -12,12 +12,12 @@ export class User implements UserType {
 	updatedAt: Date;
 
 	constructor({
-		barberShopId,
 		email,
 		isActive,
 		name,
 		password,
 		role,
+		barberShopId,
 	}: Omit<UserType, 'id' | 'createdAt' | 'updatedAt'>) {
 		this.barberShopId = barberShopId;
 		this.role = role;
