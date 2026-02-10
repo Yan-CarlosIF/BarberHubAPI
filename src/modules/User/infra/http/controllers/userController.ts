@@ -8,10 +8,13 @@ import {
 	registerClientSchema,
 } from '@modules/User/dtos/IregisterClientDTO';
 import { CreateBarberService } from '@modules/User/services/createBarber/createBarberService';
+import { ListBarbersService } from '@modules/User/services/listBarbers/listBarbersService';
 import { LoginService } from '@modules/User/services/login/loginService';
 import { RegisterClientService } from '@modules/User/services/registerClient/registerClientService';
+import { AppError } from '@shared/errors/appError';
 import type { Request, Response } from 'express';
 import { container } from 'tsyringe';
+import z from 'zod';
 
 export class UserController {
 	public async loginHandle(
@@ -72,5 +75,24 @@ export class UserController {
 		return response
 			.status(201)
 			.json({ message: 'Barber registered successfully' });
+	}
+
+	public async listBarbersHandle(
+		request: Request<{ barberShopId: string }>,
+		response: Response,
+	) {
+		const { barberShopId } = z
+			.object({ barberShopId: z.uuid('Id da barbearia inválido') })
+			.parse(request.params);
+
+		if (!barberShopId) {
+			throw new AppError('BarberShopId is required', 400);
+		}
+
+		const listBarbersService = container.resolve(ListBarbersService);
+
+		const barbers = await listBarbersService.execute(barberShopId);
+
+		return response.status(200).json(barbers);
 	}
 }

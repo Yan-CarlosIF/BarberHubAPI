@@ -6,7 +6,7 @@ export function superAdminMiddleware(
 	_res: Response,
 	next: NextFunction,
 ) {
-	if (req.user.role !== 'SUPER_ADMIN') {
+	if (req?.user?.role !== 'SUPER_ADMIN') {
 		throw new AppError('Acesso negado', 403);
 	}
 

@@ -13,3 +13,9 @@ userRoutes.post(
 	adminMiddleware,
 	userController.createBarberHandle,
 );
+userRoutes.get(
+	'/:barberShopId/barbers',
+	authMiddleware,
+	adminMiddleware,
+	userController.listBarbersHandle,
+);

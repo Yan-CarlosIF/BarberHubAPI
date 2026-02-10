@@ -107,6 +107,70 @@ export const openApiDocument = createDocument({
 				},
 			},
 		},
+		'/users/{barberShopId}/barbers': {
+			get: {
+				summary: 'Listar barbeiros',
+				tags: ['User'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Lista de barbeiros',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											userId: { type: 'string', format: 'uuid' },
+											specialty: { type: 'string' },
+											barberShopId: { type: 'string', format: 'uuid' },
+											user: {
+												id: { type: 'string', format: 'uuid' },
+												name: { type: 'string' },
+												email: { type: 'string' },
+												password: { type: 'string' },
+												role: { type: 'string' },
+												isActive: { type: 'boolean' },
+												createdAt: { type: 'string', format: 'date-time' },
+												updatedAt: { type: 'string', format: 'date-time' },
+												barberShopId: { type: 'string', format: 'uuid' },
+											},
+										},
+										example: {
+											id: 'barber_id_here',
+											userId: 'user_id_here',
+											specialty: 'Haircut',
+											barberShopId: 'barber_shop_id_here',
+											user: {
+												id: 'user_id_here',
+												name: 'John Doe',
+												email: 'john.doe@example.com',
+												password: 'password_here',
+												role: 'BARBER',
+												isActive: true,
+												createdAt: '2026-02-10T22:01:01.210Z',
+												updatedAt: '2026-02-10T22:01:01.210Z',
+												barberShopId: 'barber_shop_id_here',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 		'/users/barbers': {
 			post: {
 				summary: 'Registrar Barbeiro',

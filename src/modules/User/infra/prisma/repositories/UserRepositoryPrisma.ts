@@ -4,6 +4,7 @@ import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
 import type { IUserRepository } from '@modules/User/repository/IuserRepository';
 import { $Enums } from '@prisma/client';
 import { prisma } from '@shared/prisma/client';
+import type { Barber } from '../entities/Barber';
 import type { User } from '../entities/User';
 
 export class UserRepositoryPrisma implements IUserRepository {
@@ -62,6 +63,15 @@ export class UserRepositoryPrisma implements IUserRepository {
 	async findByEmail(email: string): Promise<User | null> {
 		return await prisma.user.findUnique({
 			where: { email },
+		});
+	}
+
+	async listBarbersByBarbershop(barberShopId: string): Promise<Barber[]> {
+		return await prisma.barber.findMany({
+			where: { barberShopId },
+			include: {
+				user: true,
+			},
 		});
 	}
 }

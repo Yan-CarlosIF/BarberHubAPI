@@ -42,4 +42,10 @@ export class UserRepositoryInMemory implements IUserRepository {
 	async findByEmail(email: string): Promise<User | null> {
 		return this.users.find((user) => user.email === email) ?? null;
 	}
+
+	async listBarbersByBarbershop(barberShopId: string): Promise<Barber[]> {
+		return this.barbers.filter(
+			(barber) => barber.barberShopId === barberShopId,
+		);
+	}
 }

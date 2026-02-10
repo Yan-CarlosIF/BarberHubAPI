@@ -3,7 +3,7 @@ import { User } from './User';
 
 export class Client implements ClientType {
 	id: string = crypto.randomUUID();
-	barberShopId: string;
+	barberShopId: string | null;
 	phone: string;
 	birthDate: Date;
 
