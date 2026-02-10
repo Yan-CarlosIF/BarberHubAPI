@@ -138,7 +138,6 @@ export const openApiDocument = createDocument({
 												id: { type: 'string', format: 'uuid' },
 												name: { type: 'string' },
 												email: { type: 'string' },
-												password: { type: 'string' },
 												role: { type: 'string' },
 												isActive: { type: 'boolean' },
 												createdAt: { type: 'string', format: 'date-time' },
@@ -155,7 +154,6 @@ export const openApiDocument = createDocument({
 												id: 'user_id_here',
 												name: 'John Doe',
 												email: 'john.doe@example.com',
-												password: 'password_here',
 												role: 'BARBER',
 												isActive: true,
 												createdAt: '2026-02-10T22:01:01.210Z',
@@ -163,6 +161,38 @@ export const openApiDocument = createDocument({
 												barberShopId: 'barber_shop_id_here',
 											},
 										},
+									},
+								},
+							},
+						},
+					},
+					400: {
+						description: 'ID da barbearia inválido',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barbershop ID is invalid',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Barbearia não encontrada',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'BarberShop not found',
 									},
 								},
 							},

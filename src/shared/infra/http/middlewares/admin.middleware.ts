@@ -1,3 +1,4 @@
+import { env } from '@config/env';
 import { AppError } from '@shared/errors/appError';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -10,15 +11,26 @@ export function adminMiddleware(
 		return next();
 	}
 
+	if (env.NODE_ENV === 'development') {
+		console.log(
+			req.user.role === 'ADMIN' ? 'Usuário é ADMIN' : 'Usuário não é ADMIN',
+			'\n',
+			req.user?.barberShopId
+				? `Usuário pertence à barbearia ${req.user.barberShopId}`
+				: 'Usuário não pertence a nenhuma barbearia',
+			'\n',
+			req.params?.barberShopId
+				? `Requisição para barbearia ${req.params.barberShopId}`
+				: 'Requisição sem barbearia específica',
+		);
+	}
+
 	if (
 		req.user.role === 'ADMIN' &&
-		req.user?.barberShopId === req.body?.barberShopId
+		req.user?.barberShopId === req.params?.barberShopId
 	) {
 		return next();
 	}
 
-	console.log(
-		'Acesso negado porque o usuário é ADMIN, mas não pertence à barbearia',
-	);
 	throw new AppError('Acesso negado', 403);
 }

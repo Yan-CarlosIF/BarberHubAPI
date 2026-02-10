@@ -82,7 +82,7 @@ export class UserController {
 		response: Response,
 	) {
 		const { barberShopId } = z
-			.object({ barberShopId: z.uuid('Id da barbearia inválido') })
+			.object({ barberShopId: z.uuid('Barbershop ID is invalid') })
 			.parse(request.params);
 
 		if (!barberShopId) {
