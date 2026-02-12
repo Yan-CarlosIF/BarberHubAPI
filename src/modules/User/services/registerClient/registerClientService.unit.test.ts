@@ -7,6 +7,7 @@ import { RegisterClientService } from './registerClientService';
 describe('RegisterClientService', () => {
 	let userRepositoryInMemory: UserRepositoryInMemory;
 	let registerClientService: RegisterClientService;
+
 	beforeEach(() => {
 		userRepositoryInMemory = new UserRepositoryInMemory();
 		registerClientService = new RegisterClientService(userRepositoryInMemory);
