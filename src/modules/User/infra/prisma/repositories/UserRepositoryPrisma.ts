@@ -3,7 +3,7 @@ import type { ICreateUserDTO } from '@modules/User/dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
 import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { $Enums } from '@prisma/client';
-import { prisma } from '@shared/prisma/client';
+import { prisma } from '@shared/infra/prisma/client';
 import type { Barber } from '../entities/Barber';
 import type { User } from '../entities/User';
 

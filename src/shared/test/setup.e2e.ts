@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { seed } from '@shared/prisma/seed/script';
+import { seed } from '@shared/infra/prisma/seed/script';
 import { createTestPrismaClient } from './client.test';
 
 if (!process.env.DATABASE_URL) {
