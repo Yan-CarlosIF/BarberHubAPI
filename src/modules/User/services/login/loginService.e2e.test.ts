@@ -1,24 +1,9 @@
 import { app } from '@shared/infra/http/app';
-import { prisma } from '@shared/prisma/client';
 import request from 'supertest';
-import { seed } from '../../../../../prisma/seed';
 
-describe('[POST] /login', () => {
-	beforeAll(async () => {
-		await seed()
-			.then(() => {
-				console.log('Database seeded successfully');
-			})
-			.catch((error) => {
-				console.error('Error seeding database:', error);
-			})
-			.finally(async () => {
-				prisma.$disconnect();
-			});
-	});
-
+describe('[POST] /auth/login', () => {
 	it('should authenticate user and return a token', async () => {
-		const reponse = await request(app).post('/login').send({
+		const reponse = await request(app).post('/auth/login').send({
 			email: 'admin@example.com',
 			password: 'hub123',
 		});
@@ -28,7 +13,7 @@ describe('[POST] /login', () => {
 	});
 
 	it('should return 401 for invalid credentials', async () => {
-		const reponse = await request(app).post('/login').send({
+		const reponse = await request(app).post('/auth/login').send({
 			email: 'invalid@example.com',
 			password: 'wrongpassword',
 		});

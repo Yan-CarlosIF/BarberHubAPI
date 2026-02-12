@@ -7,8 +7,9 @@
 		"prestart": "prisma migrate deploy && prisma generate",
 		"dev": "tsx watch src/shared/infra/http/server.ts",
 		"lint": "biome check --write src/",
-		"seed": "tsx prisma/seed.ts",
-		"test": "vitest run",
+		"seed": "tsx src/shared/prisma/seed/index.ts",
+		"test:unit": "vitest run --config vitest.config.ts",
+		"test:e2e": "vitest run --config vitest.config.e2e.ts",
 		"test:coverage": "vitest run --coverage"
 	},
 	"keywords": [],

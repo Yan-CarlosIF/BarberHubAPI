@@ -2,7 +2,7 @@ import { hash } from 'bcrypt';
 import { inject, injectable } from 'tsyringe';
 import { AppError } from '@/shared/errors/appError';
 import type { IRegisterClientDTO } from '../../dtos/IregisterClientDTO';
-import type { IUserRepository } from '../../repository/IuserRepository';
+import type { IUserRepository } from '../../repositories/IuserRepository';
 
 @injectable()
 export class RegisterClientService {

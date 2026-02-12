@@ -1,5 +1,5 @@
 import type { ICreateBarberDTO } from '@modules/User/dtos/IcreateBarberDTO';
-import type { IUserRepository } from '@modules/User/repository/IuserRepository';
+import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { AppError } from '@shared/errors/appError';
 import { hash } from 'bcrypt';
 import { inject, injectable } from 'tsyringe';

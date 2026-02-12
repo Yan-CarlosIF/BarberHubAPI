@@ -1,7 +1,7 @@
 import type { ICreateBarberDTO } from '@modules/User/dtos/IcreateBarberDTO';
 import type { ICreateUserDTO } from '@modules/User/dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
-import type { IUserRepository } from '@modules/User/repository/IuserRepository';
+import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { $Enums } from '@prisma/client';
 import { prisma } from '@shared/prisma/client';
 import type { Barber } from '../entities/Barber';

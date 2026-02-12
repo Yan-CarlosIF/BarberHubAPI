@@ -1,7 +1,7 @@
 import { env } from '@config/env';
 import { JWT_OPTIONS } from '@config/jwtOptions';
 import type { ILoginDTO } from '@modules/User/dtos/ILoginDTO';
-import type { IUserRepository } from '@modules/User/repository/IuserRepository';
+import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { AppError } from '@shared/errors/appError';
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';

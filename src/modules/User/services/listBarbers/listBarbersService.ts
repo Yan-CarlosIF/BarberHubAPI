@@ -1,7 +1,7 @@
 import type { IBarberShopRepository } from '@modules/BarberShop/repositories/IBarberShopRepository';
 import type { Barber } from '@modules/User/infra/prisma/entities/Barber';
 import { mapUserWithoutPassword } from '@modules/User/mapper/User.mapper';
-import type { IUserRepository } from '@modules/User/repository/IuserRepository';
+import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { AppError } from '@shared/errors/appError';
 import { inject, injectable } from 'tsyringe';
 

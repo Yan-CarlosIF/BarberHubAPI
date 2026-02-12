@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import { AppError } from '@shared/errors/appError';
-import { UserRepositoryInMemory } from '../../repository/inMemory/userRepositoryInMemory';
+import { UserRepositoryInMemory } from '../../repositories/inMemory/userRepositoryInMemory';
 import { RegisterClientService } from './registerClientService';
 
 describe('RegisterClientService', () => {

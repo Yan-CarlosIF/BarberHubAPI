@@ -1,8 +1,7 @@
-import { prisma } from '@shared/prisma/client';
+import type { PrismaClient } from '@prisma/client';
 import { hash } from 'bcrypt';
 
-export async function seed() {
-	await prisma.$connect();
+export async function seed(prisma: PrismaClient) {
 	console.log('Seeding super admin user...');
 
 	const hashedPassword = await hash('hub123', 10);
@@ -16,16 +15,4 @@ export async function seed() {
 			isActive: true,
 		},
 	});
-
-	console.log('Seeding completed.');
 }
-
-seed()
-	.then(async () => {
-		await prisma.$disconnect();
-	})
-	.catch(async (e) => {
-		console.error(e);
-		await prisma.$disconnect();
-		process.exit(1);
-	});
