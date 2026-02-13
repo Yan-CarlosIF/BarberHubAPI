@@ -8,7 +8,7 @@ export const userRoutes = Router();
 const userController = new UserController();
 
 userRoutes.post(
-	'/barbers',
+	'/:barberShopId/barbers',
 	authMiddleware,
 	adminMiddleware,
 	userController.createBarberHandle,

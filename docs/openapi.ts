@@ -1,7 +1,7 @@
 import { createBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
-import { createBarberSchema } from '@modules/User/dtos/IcreateBarberDTO';
+import { createBarberBody } from '@modules/User/dtos/IcreateBarberDTO';
 import { LoginSchema } from '@modules/User/dtos/ILoginDTO';
-import { registerClientSchema } from '@modules/User/dtos/IregisterClientDTO';
+import { registerClientBody } from '@modules/User/dtos/IregisterClientDTO';
 import { createDocument } from 'zod-openapi';
 
 export const openApiDocument = createDocument({
@@ -60,14 +60,23 @@ export const openApiDocument = createDocument({
 				},
 			},
 		},
-		'/auth/register': {
+		'/auth/{barberShopId}/register': {
 			post: {
 				summary: 'Registrar Cliente',
 				tags: ['User'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
 				requestBody: {
 					content: {
 						'application/json': {
-							schema: registerClientSchema,
+							schema: registerClientBody,
 						},
 					},
 				},
@@ -200,15 +209,22 @@ export const openApiDocument = createDocument({
 					},
 				},
 			},
-		},
-		'/users/barbers': {
 			post: {
 				summary: 'Registrar Barbeiro',
 				tags: ['User'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
 				requestBody: {
 					content: {
 						'application/json': {
-							schema: createBarberSchema,
+							schema: createBarberBody,
 						},
 					},
 				},

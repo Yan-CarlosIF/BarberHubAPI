@@ -11,4 +11,11 @@ export const createBarberSchema = z
 	})
 	.meta({ description: 'Body para criação de barbeiro' });
 
+export const createBarberBody = z.object({
+	name: z.string().min(1, 'Nome é obrigatório'),
+	email: z.email('Email inválido'),
+	password: z.string().min(6, 'Senha deve conter pelo menos 6 caracteres'),
+	specialty: z.string().optional(),
+});
+
 export interface ICreateBarberDTO extends z.infer<typeof createBarberSchema> {}

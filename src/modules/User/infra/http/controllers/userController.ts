@@ -31,11 +31,27 @@ export class UserController {
 	}
 
 	public async registerClientHandle(
-		request: Request<unknown, unknown, IRegisterClientDTO>,
+		request: Request<
+			Pick<IRegisterClientDTO, 'barberShopId'>,
+			unknown,
+			Omit<IRegisterClientDTO, 'barberShopId' | 'isActive'>
+		>,
 		response: Response,
 	) {
-		const { name, barberShopId, birthDate, email, password, phone } =
-			registerClientSchema.parse(request.body);
+		const { name, birthDate, email, password, phone } = registerClientSchema
+			.omit({
+				barberShopId: true,
+				isActive: true,
+			})
+			.parse(request.body);
+
+		const { barberShopId } = z
+			.object({
+				barberShopId: z
+					.uuid('Barbershop ID is invalid')
+					.nonempty('Barbershop ID is required'),
+			})
+			.parse(request.params);
 
 		const registerClientService = container.resolve(RegisterClientService);
 
@@ -55,11 +71,24 @@ export class UserController {
 	}
 
 	public async createBarberHandle(
-		request: Request<unknown, unknown, ICreateBarberDTO>,
+		request: Request<
+			Pick<ICreateBarberDTO, 'barberShopId'>,
+			unknown,
+			Omit<ICreateBarberDTO, 'isActive' | 'barberShopId'>
+		>,
 		response: Response,
 	) {
-		const { name, barberShopId, email, password, isActive, specialty } =
-			createBarberSchema.parse(request.body);
+		const { name, email, password, specialty } = createBarberSchema
+			.omit({ isActive: true, barberShopId: true })
+			.parse(request.body);
+
+		const { barberShopId } = z
+			.object({
+				barberShopId: z
+					.uuid('Barbershop ID is invalid')
+					.nonempty('Barbershop ID is required'),
+			})
+			.parse(request.params);
 
 		const createBarberService = container.resolve(CreateBarberService);
 
@@ -68,7 +97,7 @@ export class UserController {
 			barberShopId,
 			email,
 			password,
-			isActive,
+			isActive: true,
 			specialty,
 		});
 
