@@ -1,20 +1,20 @@
 import 'reflect-metadata';
 
 import { AppError } from '@shared/errors/appError';
-import { UserRepositoryInMemory } from '../../repository/inMemory/userRepositoryInMemory';
-import { RegisterClientUseCase } from './registerClientUseCase';
+import { UserRepositoryInMemory } from '../../repositories/inMemory/userRepositoryInMemory';
+import { RegisterClientService } from './registerClientService';
 
-describe('RegisterClientUseCase', () => {
+describe('RegisterClientService', () => {
 	let userRepositoryInMemory: UserRepositoryInMemory;
-	let registerClientUseCase: RegisterClientUseCase;
+	let registerClientService: RegisterClientService;
 
 	beforeEach(() => {
 		userRepositoryInMemory = new UserRepositoryInMemory();
-		registerClientUseCase = new RegisterClientUseCase(userRepositoryInMemory);
+		registerClientService = new RegisterClientService(userRepositoryInMemory);
 	});
 
 	it('should be able to create a client', async () => {
-		await registerClientUseCase.execute({
+		await registerClientService.execute({
 			email: 'H4t2V@example.com',
 			barberShopId: 'barberShopId',
 			birthDate: new Date(),
@@ -33,7 +33,7 @@ describe('RegisterClientUseCase', () => {
 	});
 
 	it('should not be able to create a client with an existing email', async () => {
-		await registerClientUseCase.execute({
+		await registerClientService.execute({
 			email: 'H4t2V@example.com',
 			barberShopId: 'barberShopId',
 			birthDate: new Date(),
@@ -44,7 +44,7 @@ describe('RegisterClientUseCase', () => {
 		});
 
 		await expect(
-			registerClientUseCase.execute({
+			registerClientService.execute({
 				email: 'H4t2V@example.com',
 				barberShopId: 'barberShopId',
 				birthDate: new Date(),

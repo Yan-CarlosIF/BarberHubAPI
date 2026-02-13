@@ -1,13 +1,14 @@
 import type { ICreateBarberDTO } from '@modules/User/dtos/IcreateBarberDTO';
-import type { ICreateClientDTO } from '@modules/User/dtos/IcreateClientDTO';
 import type { ICreateUserDTO } from '@modules/User/dtos/IcreateUserDTO';
-import type { IUserRepository } from '@modules/User/repository/IuserRepository';
+import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
+import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { $Enums } from '@prisma/client';
-import { prisma } from '@shared/prisma/client';
+import { prisma } from '@shared/infra/prisma/client';
+import type { Barber } from '../entities/Barber';
 import type { User } from '../entities/User';
 
 export class UserRepositoryPrisma implements IUserRepository {
-	async createClient(data: ICreateClientDTO): Promise<void> {
+	async createClient(data: IRegisterClientDTO): Promise<void> {
 		await prisma.user.create({
 			data: {
 				name: data.name,
@@ -15,6 +16,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 				password: data.password,
 				barberShopId: data.barberShopId,
 				role: $Enums.Role.CLIENT,
+				isActive: true,
 				client: {
 					create: {
 						phone: data.phone,
@@ -34,6 +36,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 				password: data.password,
 				barberShopId: data.barberShopId,
 				role: $Enums.Role.BARBER,
+				isActive: true,
 				barber: {
 					create: {
 						specialty: data.specialty,
@@ -52,6 +55,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 				password: data.password,
 				barberShopId: data.barberShopId,
 				role: $Enums.Role.ADMIN,
+				isActive: true,
 			},
 		});
 	}
@@ -59,6 +63,15 @@ export class UserRepositoryPrisma implements IUserRepository {
 	async findByEmail(email: string): Promise<User | null> {
 		return await prisma.user.findUnique({
 			where: { email },
+		});
+	}
+
+	async listBarbersByBarbershop(barberShopId: string): Promise<Barber[]> {
+		return await prisma.barber.findMany({
+			where: { barberShopId },
+			include: {
+				user: true,
+			},
 		});
 	}
 }

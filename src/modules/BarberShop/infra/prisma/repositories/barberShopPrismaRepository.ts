@@ -1,6 +1,6 @@
 import type { ICreateBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
 import type { IBarberShopRepository } from '@modules/BarberShop/repositories/IBarberShopRepository';
-import { prisma } from '@shared/prisma/client';
+import { prisma } from '@shared/infra/prisma/client';
 import type { BarberShop } from '../entities/BarberShop';
 
 export class BarberShopPrismaRepository implements IBarberShopRepository {

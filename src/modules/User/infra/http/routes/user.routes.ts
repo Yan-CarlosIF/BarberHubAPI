@@ -1,3 +1,21 @@
+import { adminMiddleware } from '@shared/infra/http/middlewares/admin.middleware';
+import { authMiddleware } from '@shared/infra/http/middlewares/auth.middleware';
 import { Router } from 'express';
+import { UserController } from '../controllers/userController';
 
 export const userRoutes = Router();
+
+const userController = new UserController();
+
+userRoutes.post(
+	'/:barberShopId/barbers',
+	authMiddleware,
+	adminMiddleware,
+	userController.createBarberHandle,
+);
+userRoutes.get(
+	'/:barberShopId/barbers',
+	authMiddleware,
+	adminMiddleware,
+	userController.listBarbersHandle,
+);

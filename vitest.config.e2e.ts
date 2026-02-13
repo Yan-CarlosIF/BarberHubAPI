@@ -1,21 +1,19 @@
-/// <reference types="vitest" />
 import { resolve } from 'node:path';
+import { config } from 'dotenv';
 import { defineConfig } from 'vitest/config';
+
+config({ path: resolve(__dirname, '.env') });
 
 export default defineConfig({
 	test: {
-		include: ['src/**/*unit.test.ts', 'src/**/*unit.spec.ts'],
-		exclude: ['node_modules'],
+		include: ['**/*.e2e.{test,spec}.{js,ts}'],
 		globals: true,
+		setupFiles: ['./src/shared/test/setup.e2e.ts'],
 		environment: 'node',
-		clearMocks: true,
-		coverage: {
-			provider: 'v8',
-			reporter: ['text', 'html'],
-		},
 		env: {
 			NODE_ENV: 'test',
 		},
+		pool: 'forks',
 	},
 	resolve: {
 		alias: {

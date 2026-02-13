@@ -1,5 +1,7 @@
 import { createBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
-import { registerClientSchema } from '@modules/User/infra/http/controllers/userController';
+import { createBarberBody } from '@modules/User/dtos/IcreateBarberDTO';
+import { LoginSchema } from '@modules/User/dtos/ILoginDTO';
+import { registerClientBody } from '@modules/User/dtos/IregisterClientDTO';
 import { createDocument } from 'zod-openapi';
 
 export const openApiDocument = createDocument({
@@ -11,14 +13,70 @@ export const openApiDocument = createDocument({
 	},
 	servers: [{ url: 'http://localhost:3333', description: 'Local' }],
 	paths: {
-		'/auth/register': {
+		'/auth/login': {
 			post: {
-				summary: 'Registrar Cliente',
+				summary: 'Login de Usuário',
 				tags: ['User'],
 				requestBody: {
 					content: {
 						'application/json': {
-							schema: registerClientSchema,
+							schema: LoginSchema,
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: 'Autenticação bem-sucedida',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										token: { type: 'string' },
+									},
+									example: {
+										token: 'jwt_token_here',
+									},
+								},
+							},
+						},
+					},
+					401: {
+						description: 'Credenciais inválidas',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Invalid credentials',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/auth/{barberShopId}/register': {
+			post: {
+				summary: 'Registrar Cliente',
+				tags: ['User'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: registerClientBody,
 						},
 					},
 				},
@@ -34,6 +92,154 @@ export const openApiDocument = createDocument({
 									},
 									example: {
 										message: 'Client registered successfully',
+									},
+								},
+							},
+						},
+					},
+					400: {
+						description: 'Email já registrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Email already registered',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/users/{barberShopId}/barbers': {
+			get: {
+				summary: 'Listar barbeiros',
+				tags: ['User'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Lista de barbeiros',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											userId: { type: 'string', format: 'uuid' },
+											specialty: { type: 'string' },
+											barberShopId: { type: 'string', format: 'uuid' },
+											user: {
+												id: { type: 'string', format: 'uuid' },
+												name: { type: 'string' },
+												email: { type: 'string' },
+												role: { type: 'string' },
+												isActive: { type: 'boolean' },
+												createdAt: { type: 'string', format: 'date-time' },
+												updatedAt: { type: 'string', format: 'date-time' },
+												barberShopId: { type: 'string', format: 'uuid' },
+											},
+										},
+										example: {
+											id: 'barber_id_here',
+											userId: 'user_id_here',
+											specialty: 'Haircut',
+											barberShopId: 'barber_shop_id_here',
+											user: {
+												id: 'user_id_here',
+												name: 'John Doe',
+												email: 'john.doe@example.com',
+												role: 'BARBER',
+												isActive: true,
+												createdAt: '2026-02-10T22:01:01.210Z',
+												updatedAt: '2026-02-10T22:01:01.210Z',
+												barberShopId: 'barber_shop_id_here',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					400: {
+						description: 'ID da barbearia inválido',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barbershop ID is invalid',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Barbearia não encontrada',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'BarberShop not found',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			post: {
+				summary: 'Registrar Barbeiro',
+				tags: ['User'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: createBarberBody,
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: 'Barbeiro registrado com sucesso',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barber registered successfully',
 									},
 								},
 							},
@@ -86,9 +292,24 @@ export const openApiDocument = createDocument({
 							},
 						},
 					},
+					400: {
+						description: 'Email ou telefone já registrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Email already registered',
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 	},
-	components: {},
 });

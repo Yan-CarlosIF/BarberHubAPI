@@ -1,6 +1,21 @@
-import type { ICreateUserDTO } from './IcreateUserDTO';
+import z from 'zod';
 
-export interface ICreateBarberDTO extends ICreateUserDTO {
-	barberShopId: string;
-	specialty?: string;
-}
+export const createBarberSchema = z
+	.object({
+		name: z.string().min(1, 'Nome é obrigatório'),
+		email: z.email('Email inválido'),
+		password: z.string().min(6, 'Senha deve conter pelo menos 6 caracteres'),
+		barberShopId: z.uuid().nonempty('ID da barbearia é obrigatório'),
+		isActive: z.boolean().optional().default(true),
+		specialty: z.string().optional(),
+	})
+	.meta({ description: 'Body para criação de barbeiro' });
+
+export const createBarberBody = z.object({
+	name: z.string().min(1, 'Nome é obrigatório'),
+	email: z.email('Email inválido'),
+	password: z.string().min(6, 'Senha deve conter pelo menos 6 caracteres'),
+	specialty: z.string().optional(),
+});
+
+export interface ICreateBarberDTO extends z.infer<typeof createBarberSchema> {}

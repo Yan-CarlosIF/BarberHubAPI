@@ -15,10 +15,10 @@ export async function errorHandler(
 	}
 
 	if (error instanceof ZodError) {
-		const message = error.message.split('\n');
+		const zodIssues = JSON.parse(error.message) as ZodError['issues'];
 
 		return response.status(400).json({
-			message: message[0],
+			message: zodIssues[0].message,
 		});
 	}
 

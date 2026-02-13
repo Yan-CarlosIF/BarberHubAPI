@@ -35,8 +35,6 @@ describe('CreateBarberShopService', () => {
 			mockBarberShopData.email,
 		);
 
-		console.log(createdBarberShop);
-
 		expect(createdBarberShop).toBeTruthy();
 	});
 

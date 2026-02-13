@@ -76,27 +76,27 @@ model User {
   client Client?
   barber Barber?
 
+  barberShopId String?     @map("barber_shop_id")
+  barberShop   BarberShop? @relation(fields: [barberShopId], references: [id])
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  phone     String   @db.VarChar(20)
+  birthDate DateTime @map("birth_date") @db.Date
+
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   barberShop   BarberShop? @relation(fields: [barberShopId], references: [id])
   barberShopId String?
 }
 
-model Client {
-  id           String   @id @default(uuid())
-  barberShopId String   @map("barber_shop_id")
-  userId       String   @unique @map("user_id")
-  phone        String   @db.VarChar(20)
-  birthDate    DateTime @map("birth_date") @db.Date
-
-  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 model Barber {
-  id           String  @id @default(uuid())
-  barberShopId String  @map("barber_shop_id")
-  userId       String  @unique @map("user_id")
-  specialty    String? @db.VarChar(100)
+  id        String  @id @default(uuid())
+  userId    String  @unique @map("user_id")
+  specialty String? @db.VarChar(100)
 
-  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barberShop   BarberShop? @relation(fields: [barberShopId], references: [id])
+  barberShopId String?
 }
