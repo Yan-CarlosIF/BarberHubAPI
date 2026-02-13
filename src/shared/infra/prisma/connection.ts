@@ -5,4 +5,8 @@ import { Pool } from 'pg';
 
 const connectionString = env.DATABASE_URL;
 
-export default new PrismaPg(new Pool({ connectionString }));
+export const pool = new Pool({ connectionString });
+
+export default new PrismaPg(pool, {
+	schema: env.NODE_ENV === 'test' ? 'test' : 'public',
+});
