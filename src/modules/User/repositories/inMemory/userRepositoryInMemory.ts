@@ -48,4 +48,14 @@ export class UserRepositoryInMemory implements IUserRepository {
 			(barber) => barber.barberShopId === barberShopId,
 		);
 	}
+
+	async findById(id: string): Promise<User | null> {
+		return this.users.find((user) => user.id === id) ?? null;
+	}
+
+	async delete(id: string): Promise<void> {
+		this.users = this.users.filter((user) => user.id !== id);
+		this.barbers = this.barbers.filter((barber) => barber.id !== id);
+		this.clients = this.clients.filter((client) => client.id !== id);
+	}
 }

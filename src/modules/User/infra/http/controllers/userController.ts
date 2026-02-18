@@ -2,12 +2,18 @@ import {
 	createBarberSchema,
 	type ICreateBarberDTO,
 } from '@modules/User/dtos/IcreateBarberDTO';
+import {
+	createUserSchema,
+	type ICreateUserDTO,
+} from '@modules/User/dtos/IcreateUserDTO';
 import { type ILoginDTO, LoginSchema } from '@modules/User/dtos/ILoginDTO';
 import {
 	type IRegisterClientDTO,
 	registerClientSchema,
 } from '@modules/User/dtos/IregisterClientDTO';
+import { CreateAdminService } from '@modules/User/services/createAdmin/createAdminService';
 import { CreateBarberService } from '@modules/User/services/createBarber/createBarberService';
+import { DeleteBarberService } from '@modules/User/services/deleteBarber/deleteBarberService';
 import { ListBarbersService } from '@modules/User/services/listBarbers/listBarbersService';
 import { LoginService } from '@modules/User/services/login/loginService';
 import { RegisterClientService } from '@modules/User/services/registerClient/registerClientService';
@@ -104,6 +110,59 @@ export class UserController {
 		return response
 			.status(201)
 			.json({ message: 'Barber registered successfully' });
+	}
+
+	public async createAdminHandle(
+		request: Request<
+			{ barberShopId: string },
+			unknown,
+			Omit<ICreateUserDTO, 'isActive' | 'barberShopId'>
+		>,
+		response: Response,
+	) {
+		const { name, email, password } = createUserSchema
+			.omit({ isActive: true, barberShopId: true })
+			.parse(request.body);
+
+		const { barberShopId } = z
+			.object({
+				barberShopId: z
+					.uuid('Barbershop ID is invalid')
+					.nonempty('Barbershop ID is required'),
+			})
+			.parse(request.params);
+
+		const createAdminService = container.resolve(CreateAdminService);
+
+		await createAdminService.execute({
+			name,
+			email,
+			password,
+			barberShopId,
+			isActive: true,
+		});
+
+		return response
+			.status(201)
+			.json({ message: 'Admin registered successfully' });
+	}
+
+	public async deleteBarberHandle(
+		request: Request<{ barberShopId: string; id: string }>,
+		response: Response,
+	) {
+		const { id } = z
+			.object({
+				barberShopId: z.uuid('Barbershop ID is invalid'),
+				id: z.uuid('Barber ID is invalid'),
+			})
+			.parse(request.params);
+
+		const deleteBarberService = container.resolve(DeleteBarberService);
+
+		await deleteBarberService.execute(id);
+
+		return response.status(204).send();
 	}
 
 	public async listBarbersHandle(

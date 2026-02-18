@@ -74,4 +74,12 @@ export class UserRepositoryPrisma implements IUserRepository {
 			},
 		});
 	}
+
+	async findById(id: string): Promise<User | null> {
+		return await prisma.user.findUnique({ where: { id } });
+	}
+
+	async delete(id: string): Promise<void> {
+		await prisma.user.delete({ where: { id } });
+	}
 }

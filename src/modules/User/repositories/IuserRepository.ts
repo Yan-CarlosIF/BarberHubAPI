@@ -9,5 +9,7 @@ export interface IUserRepository {
 	createBarber(data: ICreateBarberDTO): Promise<void>;
 	createAdmin(data: ICreateUserDTO): Promise<void>;
 	findByEmail(email: string): Promise<User | null>;
+	findById(id: string): Promise<User | null>;
 	listBarbersByBarbershop(barberShopId: string): Promise<Barber[]>;
+	delete(id: string): Promise<void>;
 }

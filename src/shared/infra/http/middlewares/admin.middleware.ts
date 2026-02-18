@@ -32,5 +32,8 @@ export function adminMiddleware(
 		return next();
 	}
 
-	throw new AppError('Acesso negado', 403);
+	throw new AppError(
+		'User does not have permission to perform this action',
+		403,
+	);
 }
