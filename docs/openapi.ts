@@ -1,5 +1,6 @@
 import { createBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
 import { createBarberBody } from '@modules/User/dtos/IcreateBarberDTO';
+import { createUserSchema } from '@modules/User/dtos/IcreateUserDTO';
 import { LoginSchema } from '@modules/User/dtos/ILoginDTO';
 import { registerClientBody } from '@modules/User/dtos/IregisterClientDTO';
 import { createDocument } from 'zod-openapi';
@@ -108,6 +109,82 @@ export const openApiDocument = createDocument({
 									},
 									example: {
 										message: 'Email already registered',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/users/{barberShopId}/admin': {
+			post: {
+				summary: 'Registrar Administrador',
+				tags: ['User'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: createUserSchema.omit({
+								isActive: true,
+								barberShopId: true,
+							}),
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: 'Administrador registrado com sucesso',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Admin registered successfully',
+									},
+								},
+							},
+						},
+					},
+					400: {
+						description: 'Email já registrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Email already registered',
+									},
+								},
+							},
+						},
+					},
+					403: {
+						description: 'Usuário sem permissão para realizar esta ação',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message:
+											'User does not have permission to perform this action',
 									},
 								},
 							},
@@ -256,6 +333,82 @@ export const openApiDocument = createDocument({
 									},
 									example: {
 										message: 'Email already registered',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/users/{barberShopId}/barbers/{id}': {
+			delete: {
+				summary: 'Deletar Barbeiro',
+				tags: ['User'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				responses: {
+					204: {
+						description: 'Barbeiro deletado com sucesso',
+					},
+					400: {
+						description: 'ID do barbeiro inválido',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barber ID is invalid',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Barbeiro não encontrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barber not found',
+									},
+								},
+							},
+						},
+					},
+					403: {
+						description: 'Usuário sem permissão para realizar esta ação',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message:
+											'User does not have permission to perform this action',
 									},
 								},
 							},

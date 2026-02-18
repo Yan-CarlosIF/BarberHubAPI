@@ -22,11 +22,7 @@ userRoutes.post(
 	adminMiddleware,
 	userController.createBarberHandle,
 );
-userRoutes.get(
-	'/:barberShopId/barbers',
-	authMiddleware,
-	userController.listBarbersHandle,
-);
+userRoutes.get('/:barberShopId/barbers', userController.listBarbersHandle);
 userRoutes.delete(
 	'/:barberShopId/barbers/:id',
 	authMiddleware,
