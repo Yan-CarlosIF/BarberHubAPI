@@ -3,6 +3,7 @@ import { createBarberBody } from '@modules/User/dtos/IcreateBarberDTO';
 import { createUserSchema } from '@modules/User/dtos/IcreateUserDTO';
 import { LoginSchema } from '@modules/User/dtos/ILoginDTO';
 import { registerClientBody } from '@modules/User/dtos/IregisterClientDTO';
+import { updateBarberSchema } from '@modules/User/dtos/IUpdateBarberDTO';
 import { createDocument } from 'zod-openapi';
 
 export const openApiDocument = createDocument({
@@ -409,6 +410,83 @@ export const openApiDocument = createDocument({
 									example: {
 										message:
 											'User does not have permission to perform this action',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			patch: {
+				summary: 'Atualizar Barbeiro',
+				tags: ['User'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: updateBarberSchema.omit({ id: true }),
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: 'Barbeiro atualizado com sucesso',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barber updated successfully',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Barbeiro não encontrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barber not found',
+									},
+								},
+							},
+						},
+					},
+					409: {
+						description: 'Email já registrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Email already taken',
 									},
 								},
 							},

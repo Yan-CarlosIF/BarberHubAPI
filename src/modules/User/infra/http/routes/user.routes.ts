@@ -29,3 +29,9 @@ userRoutes.delete(
 	adminMiddleware,
 	userController.deleteBarberHandle,
 );
+userRoutes.patch(
+	'/:barberShopId/barbers/:id',
+	authMiddleware,
+	adminMiddleware,
+	userController.updateBarberHandle,
+);

@@ -1,6 +1,7 @@
 import type { ICreateBarberDTO } from '@modules/User/dtos/IcreateBarberDTO';
 import type { ICreateUserDTO } from '@modules/User/dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
+import type { IUpdateBarberDTO } from '@modules/User/dtos/IUpdateBarberDTO';
 import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { $Enums } from '@prisma/client';
 import { prisma } from '@shared/infra/prisma/client';
@@ -81,5 +82,29 @@ export class UserRepositoryPrisma implements IUserRepository {
 
 	async delete(id: string): Promise<void> {
 		await prisma.user.delete({ where: { id } });
+	}
+
+	async updateBarber({
+		id,
+		isActive,
+		email,
+		name,
+		password,
+		specialty,
+	}: IUpdateBarberDTO): Promise<void> {
+		await prisma.user.update({
+			where: { id },
+			data: {
+				name,
+				email,
+				password,
+				isActive,
+				barber: {
+					update: {
+						specialty,
+					},
+				},
+			},
+		});
 	}
 }

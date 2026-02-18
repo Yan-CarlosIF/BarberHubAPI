@@ -1,3 +1,4 @@
+import type { IUpdateBarberDTO } from '@modules/User/dtos/IUpdateBarberDTO';
 import { $Enums } from '@prisma/client';
 import type { ICreateBarberDTO } from '../../dtos/IcreateBarberDTO';
 import type { ICreateUserDTO } from '../../dtos/IcreateUserDTO';
@@ -57,5 +58,30 @@ export class UserRepositoryInMemory implements IUserRepository {
 		this.users = this.users.filter((user) => user.id !== id);
 		this.barbers = this.barbers.filter((barber) => barber.id !== id);
 		this.clients = this.clients.filter((client) => client.id !== id);
+	}
+
+	async updateBarber(data: IUpdateBarberDTO): Promise<void> {
+		const barberIndex = this.barbers.findIndex(
+			(barber) => barber.id === data.id,
+		);
+		const userIndex = this.users.findIndex((user) => user.id === data.id);
+
+		if (userIndex === -1) {
+			throw new Error('User not found');
+		}
+
+		if (barberIndex === -1) {
+			throw new Error('Barber not found');
+		}
+
+		this.barbers[barberIndex] = {
+			...this.barbers[barberIndex],
+			...data,
+		};
+
+		this.users[userIndex] = {
+			...this.users[userIndex],
+			...data,
+		};
 	}
 }
