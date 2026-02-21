@@ -13,3 +13,15 @@ barberShopRoutes.post(
 	superAdminMiddleware,
 	barberShopController.create,
 );
+barberShopRoutes.delete(
+	'/:id',
+	authMiddleware,
+	superAdminMiddleware,
+	barberShopController.delete,
+);
+barberShopRoutes.get(
+	'/',
+	authMiddleware,
+	superAdminMiddleware,
+	barberShopController.list,
+);

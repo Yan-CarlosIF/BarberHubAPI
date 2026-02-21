@@ -524,7 +524,7 @@ export const openApiDocument = createDocument({
 						},
 					},
 					400: {
-						description: 'Email ou telefone já registrado',
+						description: 'Slug, email ou telefone da barbearia já registrado',
 						content: {
 							'application/json': {
 								schema: {
@@ -533,7 +533,121 @@ export const openApiDocument = createDocument({
 										message: { type: 'string' },
 									},
 									example: {
-										message: 'Email already registered',
+										message: 'Barber shop slug, email or phone already taken',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			get: {
+				summary: 'Listar Barbearias',
+				tags: ['BarberShop'],
+				responses: {
+					200: {
+						description: 'Lista de barbearias',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											name: { type: 'string' },
+											slug: { type: 'string' },
+											email: { type: 'string' },
+											phone: { type: 'string' },
+											city: { type: 'string' },
+											street: { type: 'string' },
+											state: { type: 'string' },
+											cep: { type: 'string' },
+											description: { type: 'string' },
+											createdAt: { type: 'string', format: 'date-time' },
+										},
+										example: {
+											id: 'barber_shop_id_here',
+											name: 'Barber Shop Name',
+											slug: 'barber-shop-slug',
+											email: 'barbershop@example.com',
+											phone: '1234567890',
+											city: 'City Name',
+											street: 'Street Name',
+											state: 'State Name',
+											cep: '12345-678',
+											description: 'Description of the barber shop',
+											createdAt: '2023-01-01T00:00:00Z',
+										},
+									},
+								},
+							},
+						},
+					},
+					403: {
+						description: 'Usuário sem permissão para realizar esta ação',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message:
+											'User does not have permission to perform this action',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/barber-shop/{id}': {
+			delete: {
+				summary: 'Deletar Barbearia',
+				tags: ['BarberShop'],
+				parameters: [
+					{
+						name: 'id',
+						in: 'query',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				responses: {
+					204: {
+						description: 'Barbearia deletada com sucesso',
+					},
+					400: {
+						description: 'ID da barbearia inválido',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barber shop ID is invalid',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Barbearia não encontrada',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barber shop not found',
 									},
 								},
 							},

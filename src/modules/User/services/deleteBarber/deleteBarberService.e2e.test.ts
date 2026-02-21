@@ -21,6 +21,7 @@ describe('[DELETE] /users/barbers/:id', () => {
 			.set('Authorization', `Bearer ${superAdminToken}`)
 			.send({
 				name: 'Test Barber Shop',
+				slug: 'test-barber-shop',
 				description: 'test description',
 				email: 'test@example.com',
 				phone: '(11) 11111-1111',
