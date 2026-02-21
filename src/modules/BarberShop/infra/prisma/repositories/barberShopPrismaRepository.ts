@@ -5,6 +5,7 @@ import type { BarberShop } from '../entities/BarberShop';
 
 export class BarberShopPrismaRepository implements IBarberShopRepository {
 	async create({
+		slug,
 		cep,
 		city,
 		description,
@@ -16,6 +17,7 @@ export class BarberShopPrismaRepository implements IBarberShopRepository {
 	}: ICreateBarberShopDTO): Promise<void> {
 		await prisma.barberShop.create({
 			data: {
+				slug,
 				cep,
 				city,
 				description,
@@ -26,6 +28,10 @@ export class BarberShopPrismaRepository implements IBarberShopRepository {
 				street,
 			},
 		});
+	}
+
+	async list(): Promise<BarberShop[]> {
+		return await prisma.barberShop.findMany();
 	}
 
 	async delete(id: string): Promise<void> {
@@ -49,6 +55,12 @@ export class BarberShopPrismaRepository implements IBarberShopRepository {
 	async findByEmail(email: string): Promise<BarberShop | null> {
 		return await prisma.barberShop.findUnique({
 			where: { email },
+		});
+	}
+
+	async findBySlug(slug: string): Promise<BarberShop | null> {
+		return await prisma.barberShop.findUnique({
+			where: { slug },
 		});
 	}
 }

@@ -19,6 +19,14 @@ export class CreateBarberShopService {
 			throw new AppError('Email already registered', 400);
 		}
 
+		const slugAlreadyTaken = await this.barberShopRepository.findBySlug(
+			data.slug,
+		);
+
+		if (slugAlreadyTaken) {
+			throw new AppError('Slug already registered', 400);
+		}
+
 		const phoneAlreadyTaken = await this.barberShopRepository.findByPhone(
 			data.phone,
 		);

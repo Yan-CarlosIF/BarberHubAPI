@@ -14,6 +14,7 @@ datasource db {
 
 model BarberShop {
   id          String @id @default(uuid())
+  slug        String @unique @db.VarChar(255)
   name        String @db.VarChar(255)
   description String @db.Text
   phone       String @unique @db.VarChar(20)
@@ -86,9 +87,9 @@ model Client {
   phone     String   @db.VarChar(20)
   birthDate DateTime @map("birth_date") @db.Date
 
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barberShop   BarberShop? @relation(fields: [barberShopId], references: [id])
-  barberShopId String?
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barberShop   BarberShop @relation(fields: [barberShopId], references: [id])
+  barberShopId String
 }
 
 model Barber {
@@ -96,7 +97,7 @@ model Barber {
   userId    String  @unique @map("user_id")
   specialty String? @db.VarChar(100)
 
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barberShop   BarberShop? @relation(fields: [barberShopId], references: [id])
-  barberShopId String?
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barberShop   BarberShop @relation(fields: [barberShopId], references: [id])
+  barberShopId String
 }

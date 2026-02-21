@@ -10,7 +10,8 @@ import { inject, injectable } from 'tsyringe';
 @injectable()
 export class LoginService {
 	constructor(
-		@inject('UserRepository') private userRepository: IUserRepository,
+		@inject('UserRepository')
+		private userRepository: IUserRepository,
 	) {}
 
 	async execute({ email, password }: ILoginDTO) {

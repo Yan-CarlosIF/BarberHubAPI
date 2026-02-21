@@ -3,6 +3,7 @@ import z from 'zod';
 export const createBarberShopDTO = z
 	.object({
 		name: z.string(),
+		slug: z.string(),
 		description: z.string(),
 		email: z.email(),
 		phone: z

@@ -11,6 +11,10 @@ export class BarberShopRepositoryInMemory implements IBarberShopRepository {
 		this.barberShops.push(barberShop);
 	}
 
+	async list(): Promise<BarberShop[]> {
+		return this.barberShops;
+	}
+
 	async delete(id: string): Promise<void> {
 		const barberShopIndex = this.barberShops.findIndex(
 			(barberShop) => barberShop.id === id,
@@ -45,5 +49,11 @@ export class BarberShopRepositoryInMemory implements IBarberShopRepository {
 		);
 
 		return barberShop ?? null;
+	}
+
+	async findBySlug(slug: string): Promise<BarberShop | null> {
+		return (
+			this.barberShops.find((barberShop) => barberShop.slug === slug) ?? null
+		);
 	}
 }

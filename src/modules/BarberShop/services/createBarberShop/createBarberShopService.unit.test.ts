@@ -7,6 +7,7 @@ import { AppError } from '@shared/errors/appError';
 import { CreateBarberShopService } from './createBarberShopService';
 
 const mockBarberShopData: ICreateBarberShopDTO = {
+	slug: 'test-barber-shop',
 	cep: '12345678',
 	city: 'Test City',
 	email: 'example@email.com',
@@ -52,10 +53,24 @@ describe('CreateBarberShopService', () => {
 		const newBarberShopData = {
 			...mockBarberShopData,
 			email: 'email2@example.com',
+			slug: 'test-barber-shop-2',
 		};
 
 		await expect(
 			createBarberShopService.execute(newBarberShopData),
 		).rejects.toEqual(new AppError('Phone number already registered', 400));
+	});
+
+	it('should not be able to create a barber shop with a slug that is already taken', async () => {
+		await createBarberShopService.execute(mockBarberShopData);
+
+		const newBarberShopData = {
+			...mockBarberShopData,
+			email: 'email2@example.com',
+		};
+
+		await expect(
+			createBarberShopService.execute(newBarberShopData),
+		).rejects.toEqual(new AppError('Slug already registered', 400));
 	});
 });

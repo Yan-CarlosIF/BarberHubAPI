@@ -5,6 +5,7 @@ import type {
 
 export class BarberShop implements IBarberShop {
 	id: string = crypto.randomUUID();
+	slug: string;
 	email: string;
 	name: string;
 	description: string;
@@ -26,12 +27,14 @@ export class BarberShop implements IBarberShop {
 		phone,
 		state,
 		street,
+		slug,
 	}: Omit<IBarberShop, 'id' | 'createdAt'>) {
 		this.cep = cep;
 		this.city = city;
 		this.description = description;
 		this.email = email;
 		this.name = name;
+		this.slug = slug;
 		this.phone = phone;
 		this.state = state;
 		this.street = street;

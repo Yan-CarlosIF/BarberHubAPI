@@ -6,6 +6,8 @@ config({ path: resolve(__dirname, '.env') });
 
 export default defineConfig({
 	test: {
+		fileParallelism: false,
+		isolate: false,
 		include: ['**/*.e2e.{test,spec}.{js,ts}'],
 		globals: true,
 		setupFiles: ['./src/shared/test/setup.e2e.ts'],
