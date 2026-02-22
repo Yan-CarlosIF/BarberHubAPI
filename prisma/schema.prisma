@@ -30,6 +30,8 @@ model BarberShop {
   users                  User[]
   clients                Client[]
   barbers                Barber[]
+  services               Service[]
+  schedules              Schedule[]
 }
 
 enum WeekDay {
@@ -46,8 +48,8 @@ model BarberShopOpeningHours {
   id           String  @id @default(uuid())
   barberShopId String  @map("barber_shop_id")
   weekDay      WeekDay @map("week_day")
-  openTime     String? @db.Char(5)
-  closeTime    String? @db.Char(5)
+  openTime     String? @map("open_time") @db.Char(5)
+  closeTime    String? @map("close_time") @db.Char(5)
   isClosed     Boolean @default(false) @map("is_closed")
 
   barbershop BarberShop @relation(fields: [barberShopId], references: [id], onDelete: Cascade)
@@ -82,22 +84,77 @@ model User {
 }
 
 model Client {
-  id        String   @id @default(uuid())
-  userId    String   @unique @map("user_id")
-  phone     String   @db.VarChar(20)
-  birthDate DateTime @map("birth_date") @db.Date
+  id           String   @id @default(uuid())
+  userId       String   @unique @map("user_id")
+  barberShopId String   @map("barber_shop_id")
+  phone        String   @db.VarChar(20)
+  birthDate    DateTime @map("birth_date") @db.Date
 
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barberShop   BarberShop @relation(fields: [barberShopId], references: [id])
-  barberShopId String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
+  schedules  Schedule[]
 }
 
 model Barber {
-  id        String  @id @default(uuid())
-  userId    String  @unique @map("user_id")
-  specialty String? @db.VarChar(100)
+  id           String  @id @default(uuid())
+  userId       String  @unique @map("user_id")
+  barberShopId String  @map("barber_shop_id")
+  specialty    String? @db.VarChar(100)
 
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barberShop   BarberShop @relation(fields: [barberShopId], references: [id])
-  barberShopId String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barberShop     BarberShop      @relation(fields: [barberShopId], references: [id])
+  barberServices BarberService[]
+  schedules      Schedule[]
+}
+
+model Service {
+  id                String   @id @default(uuid())
+  barberShopId      String   @map("barber_shop_id")
+  name              String   @db.VarChar(255)
+  description       String?  @db.Text
+  price             Decimal  @db.Decimal(10, 2)
+  durationInMinutes Int      @map("duration_in_minutes")
+  isActive          Boolean  @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  barberShop     BarberShop      @relation(fields: [barberShopId], references: [id], onDelete: Cascade)
+  barberServices BarberService[]
+  schedules      Schedule[]
+}
+
+model BarberService {
+  id        String @id @default(uuid())
+  barberId  String @map("barber_id")
+  serviceId String @map("service_id")
+
+  barber  Barber  @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([barberId, serviceId])
+}
+
+enum ScheduleStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+  NO_SHOW
+}
+
+model Schedule {
+  id           String         @id @default(uuid())
+  barberShopId String         @map("barber_shop_id")
+  clientId     String         @map("client_id")
+  barberId     String         @map("barber_id")
+  serviceId    String         @map("service_id")
+  date         DateTime       @db.Date
+  startTime    String         @map("start_time") @db.Char(5)
+  endTime      String         @map("end_time") @db.Char(5)
+  status       ScheduleStatus @default(SCHEDULED)
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  client     Client     @relation(fields: [clientId], references: [id])
+  barber     Barber     @relation(fields: [barberId], references: [id])
+  service    Service    @relation(fields: [serviceId], references: [id])
+  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
 }

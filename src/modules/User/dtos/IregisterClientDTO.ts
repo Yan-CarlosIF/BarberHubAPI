@@ -20,7 +20,6 @@ export const registerClientBody = z
 		name: z.string().min(1, 'Nome é obrigatório'),
 		email: z.email('Email inválido'),
 		password: z.string().min(6, 'Senha deve conter pelo menos 6 caracteres'),
-		barberShopId: z.uuid().nonempty('ID da barbearia é obrigatório'),
 		phone: z
 			.string()
 			.regex(

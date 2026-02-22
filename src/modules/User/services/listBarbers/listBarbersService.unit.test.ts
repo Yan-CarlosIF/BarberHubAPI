@@ -22,6 +22,7 @@ describe('ListBarbersService', () => {
 	it('should be able to list barbers by barbershop', async () => {
 		await barberShopRepositoryInMemory.create({
 			name: 'Barber Shop',
+			slug: 'barber-shop',
 			cep: '12345678',
 			city: 'City',
 			description: 'Description',
