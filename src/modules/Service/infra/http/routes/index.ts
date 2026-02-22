@@ -12,3 +12,19 @@ serviceRoutes.post(
 	adminMiddleware,
 	serviceController.create,
 );
+
+serviceRoutes.get('/:barberShopId', serviceController.list);
+
+serviceRoutes.patch(
+	'/:barberShopId/:id',
+	authMiddleware,
+	adminMiddleware,
+	serviceController.update,
+);
+
+serviceRoutes.delete(
+	'/:barberShopId/:id',
+	authMiddleware,
+	adminMiddleware,
+	serviceController.delete,
+);

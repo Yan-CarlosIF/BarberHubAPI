@@ -31,8 +31,12 @@ export class ServiceRepositoryPrisma implements IServiceRepository {
 		});
 	}
 
-	async findAll(): Promise<Service[]> {
-		return await prisma.service.findMany();
+	async findAllByBarberShopId(barberShopId: string): Promise<Service[]> {
+		return await prisma.service.findMany({
+			where: {
+				barberShopId,
+			},
+		});
 	}
 
 	async update(

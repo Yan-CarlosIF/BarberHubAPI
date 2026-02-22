@@ -30,8 +30,10 @@ export class ServiceRepositoryInMemory implements IServiceRepository {
 		return this.services.find((service) => service.id === id) ?? null;
 	}
 
-	async findAll(): Promise<Service[]> {
-		return this.services;
+	async findAllByBarberShopId(barberShopId: string): Promise<Service[]> {
+		return this.services.filter(
+			(service) => service.barberShopId === barberShopId,
+		);
 	}
 
 	async update(id: string, data: IUpdateServiceDTO): Promise<void> {

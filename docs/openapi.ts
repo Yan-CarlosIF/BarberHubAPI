@@ -1,4 +1,6 @@
 import { createBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
+import { createServiceBodySchema } from '@modules/Service/dtos/ICreateServiceDTO';
+import { updateServiceSchema } from '@modules/Service/dtos/IUpdateServiceDTO';
 import { createBarberBody } from '@modules/User/dtos/IcreateBarberDTO';
 import { createUserSchema } from '@modules/User/dtos/IcreateUserDTO';
 import { LoginSchema } from '@modules/User/dtos/ILoginDTO';
@@ -579,6 +581,258 @@ export const openApiDocument = createDocument({
 											description: 'Description of the barber shop',
 											createdAt: '2023-01-01T00:00:00Z',
 										},
+									},
+								},
+							},
+						},
+					},
+					403: {
+						description: 'Usuário sem permissão para realizar esta ação',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message:
+											'User does not have permission to perform this action',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/services/{barberShopId}': {
+			post: {
+				summary: 'Criar Serviço',
+				tags: ['Service'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: createServiceBodySchema,
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: 'Serviço criado com sucesso',
+					},
+					404: {
+						description: 'Barbearia não encontrada',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barber shop not found',
+									},
+								},
+							},
+						},
+					},
+					403: {
+						description: 'Usuário sem permissão para realizar esta ação',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message:
+											'User does not have permission to perform this action',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			get: {
+				summary: 'Listar Serviços por Barbearia',
+				tags: ['Service'],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Lista de serviços da barbearia',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											barberShopId: { type: 'string', format: 'uuid' },
+											name: { type: 'string' },
+											description: { type: 'string', nullable: true },
+											price: { type: 'number' },
+											durationInMinutes: { type: 'integer' },
+											isActive: { type: 'boolean' },
+											createdAt: { type: 'string', format: 'date-time' },
+										},
+										example: {
+											id: 'service_id_here',
+											barberShopId: 'barber_shop_id_here',
+											name: 'Corte de cabelo',
+											description: 'Corte masculino',
+											price: 50,
+											durationInMinutes: 30,
+											isActive: true,
+											createdAt: '2026-02-21T00:00:00Z',
+										},
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Barbearia não encontrada',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Barber shop not found',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/services/{barberShopId}/{id}': {
+			patch: {
+				summary: 'Atualizar Serviço',
+				tags: ['Service'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do serviço',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: updateServiceSchema,
+						},
+					},
+				},
+				responses: {
+					204: {
+						description: 'Serviço atualizado com sucesso',
+					},
+					404: {
+						description: 'Serviço não encontrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Service not found',
+									},
+								},
+							},
+						},
+					},
+					403: {
+						description: 'Usuário sem permissão para realizar esta ação',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message:
+											'User does not have permission to perform this action',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			delete: {
+				summary: 'Deletar Serviço',
+				tags: ['Service'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do serviço',
+					},
+				],
+				responses: {
+					204: {
+						description: 'Serviço deletado com sucesso',
+					},
+					404: {
+						description: 'Serviço não encontrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Service not found',
 									},
 								},
 							},
