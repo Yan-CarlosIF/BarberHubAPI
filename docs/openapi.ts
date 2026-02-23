@@ -1,4 +1,6 @@
 import { createBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
+import { createScheduleBodySchema } from '@modules/Schedule/dtos/ICreateScheduleDTO';
+import { updateScheduleStatusBodySchema } from '@modules/Schedule/dtos/IUpdateScheduleStatusDTO';
 import { createServiceBodySchema } from '@modules/Service/dtos/ICreateServiceDTO';
 import { updateServiceSchema } from '@modules/Service/dtos/IUpdateServiceDTO';
 import { createBarberBody } from '@modules/User/dtos/IcreateBarberDTO';
@@ -833,6 +835,439 @@ export const openApiDocument = createDocument({
 									},
 									example: {
 										message: 'Service not found',
+									},
+								},
+							},
+						},
+					},
+					403: {
+						description: 'Usuário sem permissão para realizar esta ação',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message:
+											'User does not have permission to perform this action',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/schedules/{barberShopId}': {
+			post: {
+				summary: 'Criar Agendamento',
+				tags: ['Schedule'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: createScheduleBodySchema,
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: 'Agendamento criado com sucesso',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Schedule created successfully',
+									},
+								},
+							},
+						},
+					},
+					401: {
+						description: 'Usuário não autenticado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'User not authenticated',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Serviço não encontrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Service not found',
+									},
+								},
+							},
+						},
+					},
+					409: {
+						description: 'Conflito de horário',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'This time slot is already booked for this barber',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			get: {
+				summary: 'Listar Agendamentos por Barbearia',
+				tags: ['Schedule'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Lista de agendamentos da barbearia',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											barberShopId: { type: 'string', format: 'uuid' },
+											clientId: { type: 'string', format: 'uuid' },
+											barberId: { type: 'string', format: 'uuid' },
+											serviceId: { type: 'string', format: 'uuid' },
+											date: { type: 'string', format: 'date' },
+											startTime: { type: 'string', example: '10:00' },
+											endTime: { type: 'string', example: '10:30' },
+											status: {
+												type: 'string',
+												enum: ['SCHEDULED', 'COMPLETED', 'CANCELED', 'NO_SHOW'],
+											},
+											createdAt: { type: 'string', format: 'date-time' },
+											updatedAt: { type: 'string', format: 'date-time' },
+										},
+										example: {
+											id: 'schedule_id_here',
+											barberShopId: 'barber_shop_id_here',
+											clientId: 'client_id_here',
+											barberId: 'barber_id_here',
+											serviceId: 'service_id_here',
+											date: '2026-03-15',
+											startTime: '10:00',
+											endTime: '10:30',
+											status: 'SCHEDULED',
+											createdAt: '2026-03-14T12:00:00Z',
+											updatedAt: '2026-03-14T12:00:00Z',
+										},
+									},
+								},
+							},
+						},
+					},
+					403: {
+						description: 'Usuário sem permissão para realizar esta ação',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message:
+											'User does not have permission to perform this action',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/schedules/my-schedules': {
+			get: {
+				summary: 'Listar Agendamentos do Cliente Autenticado',
+				tags: ['Schedule'],
+				security: [{ bearerAuth: [] }],
+				responses: {
+					200: {
+						description: 'Lista de agendamentos do cliente',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											barberShopId: { type: 'string', format: 'uuid' },
+											clientId: { type: 'string', format: 'uuid' },
+											barberId: { type: 'string', format: 'uuid' },
+											serviceId: { type: 'string', format: 'uuid' },
+											date: { type: 'string', format: 'date' },
+											startTime: { type: 'string', example: '10:00' },
+											endTime: { type: 'string', example: '10:30' },
+											status: {
+												type: 'string',
+												enum: ['SCHEDULED', 'COMPLETED', 'CANCELED', 'NO_SHOW'],
+											},
+											createdAt: { type: 'string', format: 'date-time' },
+											updatedAt: { type: 'string', format: 'date-time' },
+										},
+									},
+								},
+							},
+						},
+					},
+					401: {
+						description: 'Usuário não autenticado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'User not authenticated',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/schedules/{barberShopId}/barber/{barberId}': {
+			get: {
+				summary: 'Listar Agendamentos por Barbeiro',
+				tags: ['Schedule'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Lista de agendamentos do barbeiro',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											barberShopId: { type: 'string', format: 'uuid' },
+											clientId: { type: 'string', format: 'uuid' },
+											barberId: { type: 'string', format: 'uuid' },
+											serviceId: { type: 'string', format: 'uuid' },
+											date: { type: 'string', format: 'date' },
+											startTime: { type: 'string', example: '10:00' },
+											endTime: { type: 'string', example: '10:30' },
+											status: {
+												type: 'string',
+												enum: ['SCHEDULED', 'COMPLETED', 'CANCELED', 'NO_SHOW'],
+											},
+											createdAt: { type: 'string', format: 'date-time' },
+											updatedAt: { type: 'string', format: 'date-time' },
+										},
+									},
+								},
+							},
+						},
+					},
+					401: {
+						description: 'Usuário não autenticado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Usuário não autorizado',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/schedules/{barberShopId}/{id}/cancel': {
+			patch: {
+				summary: 'Cancelar Agendamento',
+				tags: ['Schedule'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do agendamento',
+					},
+				],
+				responses: {
+					204: {
+						description: 'Agendamento cancelado com sucesso',
+					},
+					400: {
+						description: 'Agendamento já cancelado ou não pode ser cancelado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Schedule is already canceled',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Agendamento não encontrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Schedule not found',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		'/schedules/{barberShopId}/{id}/status': {
+			patch: {
+				summary: 'Atualizar Status do Agendamento',
+				tags: ['Schedule'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberShopId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID da barbearia',
+					},
+					{
+						name: 'id',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do agendamento',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: updateScheduleStatusBodySchema,
+						},
+					},
+				},
+				responses: {
+					204: {
+						description: 'Status do agendamento atualizado com sucesso',
+					},
+					400: {
+						description:
+							'Não é possível atualizar um agendamento cancelado ou concluído',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Cannot update a canceled schedule',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Agendamento não encontrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: { type: 'string' },
+									},
+									example: {
+										message: 'Schedule not found',
 									},
 								},
 							},
