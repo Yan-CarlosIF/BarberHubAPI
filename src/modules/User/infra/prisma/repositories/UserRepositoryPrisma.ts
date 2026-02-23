@@ -1,11 +1,11 @@
-import type { ICreateBarberDTO } from '@modules/User/dtos/IcreateBarberDTO';
+import type { ICreateBarberDTO } from '@modules/Barber/dtos/ICreateBarberDTO';
+import type { IUpdateBarberDTO } from '@modules/Barber/dtos/IUpdateBarberDTO';
+import type { Barber } from '@modules/Barber/infra/prisma/entities/Barber';
 import type { ICreateUserDTO } from '@modules/User/dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
-import type { IUpdateBarberDTO } from '@modules/User/dtos/IUpdateBarberDTO';
 import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { $Enums } from '@prisma/client';
 import { prisma } from '@shared/infra/prisma/client';
-import type { Barber } from '../entities/Barber';
 import type { User } from '../entities/User';
 
 export class UserRepositoryPrisma implements IUserRepository {

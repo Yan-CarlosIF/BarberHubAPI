@@ -1,5 +1,5 @@
+import { User } from '@modules/User/infra/prisma/entities/User';
 import { $Enums, type Barber as BarberType } from '@prisma/client';
-import { User } from './User';
 
 export class Barber implements BarberType {
 	id: string = crypto.randomUUID();

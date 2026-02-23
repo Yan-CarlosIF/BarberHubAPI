@@ -3,7 +3,7 @@ import { app } from '@shared/infra/http/app';
 import { prisma } from '@shared/infra/prisma/client';
 import request from 'supertest';
 
-describe('[DELETE] /users/barbers/:id', () => {
+describe('[DELETE] /barbers/:barberShopId/:id', () => {
 	let superAdminToken: string;
 	let adminToken: string;
 	let barberShopId: string;
@@ -57,7 +57,7 @@ describe('[DELETE] /users/barbers/:id', () => {
 
 	it('should be able to delete a barber', async () => {
 		await request(app)
-			.post(`/users/${barberShopId}/barbers`)
+			.post(`/barbers/${barberShopId}`)
 			.set('Authorization', `Bearer ${adminToken}`)
 			.send({
 				name: 'Barber to Delete',
@@ -72,7 +72,7 @@ describe('[DELETE] /users/barbers/:id', () => {
 		});
 
 		const response = await request(app)
-			.delete(`/users/${barberShopId}/barbers/${barber?.id}`)
+			.delete(`/barbers/${barberShopId}/${barber?.id}`)
 			.set('Authorization', `Bearer ${adminToken}`);
 
 		expect(response.status).toBe(204);
@@ -80,7 +80,7 @@ describe('[DELETE] /users/barbers/:id', () => {
 
 	it('should not be able to delete a non-existent barber', async () => {
 		const response = await request(app)
-			.delete(`/users/${barberShopId}/barbers/${randomUUID()}`)
+			.delete(`/barbers/${barberShopId}/${randomUUID()}`)
 			.set('Authorization', `Bearer ${adminToken}`);
 
 		expect(response.status).toBe(404);
@@ -90,7 +90,7 @@ describe('[DELETE] /users/barbers/:id', () => {
 	it('should not allow non-admin users to delete a barber', async () => {
 		// creating a barber to be deleted by non-admin user
 		await request(app)
-			.post(`/users/${barberShopId}/barbers`)
+			.post(`/barbers/${barberShopId}`)
 			.set('Authorization', `Bearer ${adminToken}`)
 			.send({
 				name: 'non-admin user',
@@ -106,7 +106,7 @@ describe('[DELETE] /users/barbers/:id', () => {
 		const nonAdminToken = nonAdminUserLogin.body.token;
 
 		await request(app)
-			.post(`/users/${barberShopId}/barbers`)
+			.post(`/barbers/${barberShopId}`)
 			.set('Authorization', `Bearer ${adminToken}`)
 			.send({
 				name: 'Barber to Delete',
@@ -121,7 +121,7 @@ describe('[DELETE] /users/barbers/:id', () => {
 		});
 
 		const response = await request(app)
-			.delete(`/users/${barberShopId}/barbers/${barber?.id}`)
+			.delete(`/barbers/${barberShopId}/${barber?.id}`)
 			.set('Authorization', `Bearer ${nonAdminToken}`);
 
 		expect(response.status).toBe(403);

@@ -1,3 +1,4 @@
+import { barberRoutes } from '@modules/Barber/infra/http/routes';
 import { barberShopRoutes } from '@modules/BarberShop/infra/http/routes/barberShop.routes';
 import { scheduleRoutes } from '@modules/Schedule/infra/http/routes';
 import { serviceRoutes } from '@modules/Service/infra/http/routes';
@@ -12,3 +13,4 @@ appRoutes.use('/users', userRoutes);
 appRoutes.use('/barber-shop', barberShopRoutes);
 appRoutes.use('/services', serviceRoutes);
 appRoutes.use('/schedules', scheduleRoutes);
+appRoutes.use('/barbers', barberRoutes);

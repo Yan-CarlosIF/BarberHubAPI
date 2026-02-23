@@ -1,9 +1,9 @@
-import type { IUpdateBarberDTO } from '@modules/User/dtos/IUpdateBarberDTO';
+import type { ICreateBarberDTO } from '@modules/Barber/dtos/ICreateBarberDTO';
+import type { IUpdateBarberDTO } from '@modules/Barber/dtos/IUpdateBarberDTO';
+import { Barber } from '@modules/Barber/infra/prisma/entities/Barber';
 import { $Enums } from '@prisma/client';
-import type { ICreateBarberDTO } from '../../dtos/IcreateBarberDTO';
 import type { ICreateUserDTO } from '../../dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '../../dtos/IregisterClientDTO';
-import { Barber } from '../../infra/prisma/entities/Barber';
 import { Client } from '../../infra/prisma/entities/Client';
 import { User } from '../../infra/prisma/entities/User';
 import type { IUserRepository } from '../IuserRepository';

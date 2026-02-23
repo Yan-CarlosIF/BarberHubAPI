@@ -1,13 +1,16 @@
+import { assignBarberServiceBodySchema } from '@modules/Barber/dtos/IAssignBarberServiceDTO';
+import { createBarberAvailabilityBodySchema } from '@modules/Barber/dtos/ICreateBarberAvailabilityDTO';
+import { createBarberBlockBodySchema } from '@modules/Barber/dtos/ICreateBarberBlockDTO';
+import { createBarberBody } from '@modules/Barber/dtos/ICreateBarberDTO';
+import { updateBarberSchema } from '@modules/Barber/dtos/IUpdateBarberDTO';
 import { createBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
 import { createScheduleBodySchema } from '@modules/Schedule/dtos/ICreateScheduleDTO';
 import { updateScheduleStatusBodySchema } from '@modules/Schedule/dtos/IUpdateScheduleStatusDTO';
 import { createServiceBodySchema } from '@modules/Service/dtos/ICreateServiceDTO';
 import { updateServiceSchema } from '@modules/Service/dtos/IUpdateServiceDTO';
-import { createBarberBody } from '@modules/User/dtos/IcreateBarberDTO';
 import { createUserSchema } from '@modules/User/dtos/IcreateUserDTO';
 import { LoginSchema } from '@modules/User/dtos/ILoginDTO';
 import { registerClientBody } from '@modules/User/dtos/IregisterClientDTO';
-import { updateBarberSchema } from '@modules/User/dtos/IUpdateBarberDTO';
 import { createDocument } from 'zod-openapi';
 
 export const openApiDocument = createDocument({
@@ -198,10 +201,10 @@ export const openApiDocument = createDocument({
 				},
 			},
 		},
-		'/users/{barberShopId}/barbers': {
+		'/barbers/{barberShopId}': {
 			get: {
 				summary: 'Listar barbeiros',
-				tags: ['User'],
+				tags: ['Barber'],
 				parameters: [
 					{
 						name: 'barberShopId',
@@ -293,7 +296,7 @@ export const openApiDocument = createDocument({
 			},
 			post: {
 				summary: 'Registrar Barbeiro',
-				tags: ['User'],
+				tags: ['Barber'],
 				parameters: [
 					{
 						name: 'barberShopId',
@@ -346,10 +349,10 @@ export const openApiDocument = createDocument({
 				},
 			},
 		},
-		'/users/{barberShopId}/barbers/{id}': {
+		'/barbers/{barberShopId}/{id}': {
 			delete: {
 				summary: 'Deletar Barbeiro',
-				tags: ['User'],
+				tags: ['Barber'],
 				parameters: [
 					{
 						name: 'barberShopId',
@@ -423,7 +426,7 @@ export const openApiDocument = createDocument({
 			},
 			patch: {
 				summary: 'Atualizar Barbeiro',
-				tags: ['User'],
+				tags: ['Barber'],
 				parameters: [
 					{
 						name: 'barberShopId',
@@ -1337,6 +1340,450 @@ export const openApiDocument = createDocument({
 									},
 									example: {
 										message: 'Barber shop not found',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		// ── Barber Availability ────────────────────────────────────
+
+		'/barbers/{barberId}/availability': {
+			post: {
+				summary: 'Definir Disponibilidade do Barbeiro',
+				description:
+					'Define (cria ou substitui) o horário de trabalho do barbeiro para um dia da semana. Requer autenticação e permissão de administrador.',
+				tags: ['Barber'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: createBarberAvailabilityBodySchema,
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: 'Disponibilidade definida com sucesso',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: { message: 'Availability set successfully' },
+								},
+							},
+						},
+					},
+					400: {
+						description: 'Horário inválido',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: {
+										message: 'Start time must be before end time',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			get: {
+				summary: 'Listar Disponibilidade do Barbeiro',
+				description:
+					'Lista todos os horários de trabalho configurados para o barbeiro, separados por dia da semana.',
+				tags: ['Barber'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Lista de disponibilidades',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											barberId: { type: 'string', format: 'uuid' },
+											weekDay: {
+												type: 'string',
+												enum: [
+													'SUNDAY',
+													'MONDAY',
+													'TUESDAY',
+													'WEDNESDAY',
+													'THURSDAY',
+													'FRIDAY',
+													'SATURDAY',
+												],
+											},
+											startTime: { type: 'string', example: '09:00' },
+											endTime: { type: 'string', example: '18:00' },
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			delete: {
+				summary: 'Deletar Toda Disponibilidade do Barbeiro',
+				description:
+					'Remove todos os horários de trabalho configurados para o barbeiro. Requer autenticação e permissão de administrador.',
+				tags: ['Barber'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				responses: {
+					204: {
+						description: 'Disponibilidade removida com sucesso',
+					},
+					404: {
+						description: 'Nenhuma disponibilidade encontrada',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: {
+										message: 'No availability found for this barber',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		// ── Barber Blocks ─────────────────────────────────────────
+
+		'/barbers/{barberId}/blocks': {
+			post: {
+				summary: 'Criar Bloqueio de Horário',
+				description:
+					'Cria um bloqueio de horário para o barbeiro em uma data específica. Requer autenticação e permissão de administrador.',
+				tags: ['Barber'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: createBarberBlockBodySchema,
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: 'Bloqueio criado com sucesso',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: { message: 'Block created successfully' },
+								},
+							},
+						},
+					},
+					400: {
+						description: 'Horário inválido',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: {
+										message: 'Start time must be before end time',
+									},
+								},
+							},
+						},
+					},
+					409: {
+						description: 'Conflito com bloqueio existente',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: {
+										message:
+											'There is already a block overlapping this time range',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			get: {
+				summary: 'Listar Bloqueios do Barbeiro',
+				description: 'Lista todos os bloqueios de horário do barbeiro.',
+				tags: ['Barber'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Lista de bloqueios',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											barberId: { type: 'string', format: 'uuid' },
+											date: {
+												type: 'string',
+												format: 'date',
+												example: '2026-03-15',
+											},
+											startTime: { type: 'string', example: '12:00' },
+											endTime: { type: 'string', example: '14:00' },
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		'/barbers/{barberId}/blocks/{blockId}': {
+			delete: {
+				summary: 'Deletar Bloqueio de Horário',
+				description:
+					'Remove um bloqueio de horário específico. Requer autenticação e permissão de administrador.',
+				tags: ['Barber'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+					{
+						name: 'blockId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do bloqueio',
+					},
+				],
+				responses: {
+					204: {
+						description: 'Bloqueio removido com sucesso',
+					},
+					404: {
+						description: 'Bloqueio não encontrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: { message: 'Block not found' },
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		// ── Barber Services ───────────────────────────────────────
+
+		'/barbers/{barberId}/services': {
+			post: {
+				summary: 'Associar Serviço ao Barbeiro',
+				description:
+					'Associa um serviço já existente a um barbeiro específico, indicando que ele é apto a realizá-lo. Requer autenticação e permissão de administrador.',
+				tags: ['Barber'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				requestBody: {
+					content: {
+						'application/json': {
+							schema: assignBarberServiceBodySchema,
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: 'Serviço associado com sucesso',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: { message: 'Service assigned successfully' },
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Serviço não encontrado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: { message: 'Service not found' },
+								},
+							},
+						},
+					},
+					409: {
+						description: 'Serviço já associado',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: {
+										message: 'This service is already assigned to this barber',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			get: {
+				summary: 'Listar Serviços do Barbeiro',
+				description:
+					'Lista todos os serviços que estão associados ao barbeiro.',
+				tags: ['Barber'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Lista de serviços associados',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										type: 'object',
+										properties: {
+											id: { type: 'string', format: 'uuid' },
+											barberId: { type: 'string', format: 'uuid' },
+											serviceId: { type: 'string', format: 'uuid' },
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		'/barbers/{barberId}/services/{serviceId}': {
+			delete: {
+				summary: 'Desassociar Serviço do Barbeiro',
+				description:
+					'Remove a associação de um serviço de um barbeiro. Requer autenticação e permissão de administrador.',
+				tags: ['Barber'],
+				security: [{ bearerAuth: [] }],
+				parameters: [
+					{
+						name: 'barberId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do barbeiro',
+					},
+					{
+						name: 'serviceId',
+						in: 'path',
+						required: true,
+						schema: { type: 'string', format: 'uuid' },
+						description: 'ID do serviço',
+					},
+				],
+				responses: {
+					204: {
+						description: 'Serviço desassociado com sucesso',
+					},
+					404: {
+						description: 'Associação não encontrada',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: { message: { type: 'string' } },
+									example: {
+										message: 'This service is not assigned to this barber',
 									},
 								},
 							},

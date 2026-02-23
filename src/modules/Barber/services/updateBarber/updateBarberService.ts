@@ -1,4 +1,4 @@
-import type { IUpdateBarberDTO } from '@modules/User/dtos/IUpdateBarberDTO';
+import type { IUpdateBarberDTO } from '@modules/Barber/dtos/IUpdateBarberDTO';
 import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { AppError } from '@shared/errors/appError';
 import { hash } from 'bcrypt';

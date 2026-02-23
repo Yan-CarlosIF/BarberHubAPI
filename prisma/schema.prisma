@@ -101,10 +101,32 @@ model Barber {
   barberShopId String  @map("barber_shop_id")
   specialty    String? @db.VarChar(100)
 
-  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barberShop     BarberShop      @relation(fields: [barberShopId], references: [id])
-  barberServices BarberService[]
-  schedules      Schedule[]
+  user                 User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barberShop           BarberShop           @relation(fields: [barberShopId], references: [id])
+  barberServices       BarberService[]
+  schedules            Schedule[]
+  barberAvailabilities BarberAvailability[]
+  barberBlocks         BarberBlock[]
+}
+
+model BarberAvailability {
+  id        String  @id @default(uuid())
+  barberId  String  @map("barber_id")
+  weekDay   WeekDay @map("week_day")
+  startTime String  @map("start_time") @db.Char(5)
+  endTime   String  @map("end_time") @db.Char(5)
+
+  barber Barber @relation(fields: [barberId], references: [id], onDelete: Cascade)
+}
+
+model BarberBlock {
+  id        String   @id @default(uuid())
+  barberId  String   @map("barber_id")
+  date      DateTime @db.Date
+  startTime String   @map("start_time") @db.Char(5)
+  endTime   String   @map("end_time") @db.Char(5)
+
+  barber Barber @relation(fields: [barberId], references: [id], onDelete: Cascade)
 }
 
 model Service {

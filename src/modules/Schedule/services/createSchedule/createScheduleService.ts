@@ -1,3 +1,5 @@
+import type { IBarberAvailabilityRepository } from '@modules/Barber/repositories/IBarberAvailabilityRepository';
+import type { IBarberBlockRepository } from '@modules/Barber/repositories/IBarberBlockRepository';
 import type { ICreateScheduleBodyDTO } from '@modules/Schedule/dtos/ICreateScheduleDTO';
 import type { IScheduleRepository } from '@modules/Schedule/repositories/IScheduleRepository';
 import type { IServiceRepository } from '@modules/Service/repositories/IServiceRepository';
@@ -8,6 +10,16 @@ interface IRequest extends ICreateScheduleBodyDTO {
 	barberShopId: string;
 	clientId: string;
 }
+
+const WEEK_DAYS = [
+	'SUNDAY',
+	'MONDAY',
+	'TUESDAY',
+	'WEDNESDAY',
+	'THURSDAY',
+	'FRIDAY',
+	'SATURDAY',
+] as const;
 
 function addMinutesToTime(time: string, minutes: number): string {
 	const [hours, mins] = time.split(':').map(Number);
@@ -26,6 +38,10 @@ export class CreateScheduleService {
 		private scheduleRepository: IScheduleRepository,
 		@inject('ServiceRepository')
 		private serviceRepository: IServiceRepository,
+		@inject('BarberAvailabilityRepository')
+		private barberAvailabilityRepository: IBarberAvailabilityRepository,
+		@inject('BarberBlockRepository')
+		private barberBlockRepository: IBarberBlockRepository,
 	) {}
 
 	async execute({
@@ -47,6 +63,35 @@ export class CreateScheduleService {
 		}
 
 		const endTime = addMinutesToTime(startTime, service.durationInMinutes);
+
+		// Validate barber availability for the given week day
+		const dayOfWeek = WEEK_DAYS[new Date(date).getUTCDay()];
+
+		const availability =
+			await this.barberAvailabilityRepository.findByBarberIdAndWeekDay(
+				barberId,
+				dayOfWeek,
+			);
+
+		if (!availability) {
+			throw new AppError('Barber is not available on this day', 400);
+		}
+
+		if (startTime < availability.startTime || endTime > availability.endTime) {
+			throw new AppError('Schedule is outside barber working hours', 400);
+		}
+
+		// Check for barber blocks on that date/time
+		const block = await this.barberBlockRepository.findByBarberIdAndDateRange(
+			barberId,
+			date,
+			startTime,
+			endTime,
+		);
+
+		if (block) {
+			throw new AppError('Barber has blocked this time slot', 409);
+		}
 
 		const conflictingSchedule =
 			await this.scheduleRepository.findByBarberAndDateRange(

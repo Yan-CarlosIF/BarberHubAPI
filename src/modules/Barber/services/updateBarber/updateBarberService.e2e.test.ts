@@ -2,7 +2,7 @@ import { app } from '@shared/infra/http/app';
 import { prisma } from '@shared/infra/prisma/client';
 import request from 'supertest';
 
-describe('[PATCH] /users/:barberShopId/barbers/:id', () => {
+describe('[PATCH] /barbers/:barberShopId/:id', () => {
 	let superAdminToken: string;
 	let adminToken: string;
 	let barberShopId: string;
@@ -58,7 +58,7 @@ describe('[PATCH] /users/:barberShopId/barbers/:id', () => {
 	it('should be able to update a barber successfully', async () => {
 		// First, create a barber to update
 		await request(app)
-			.post(`/users/${barberShopId}/barbers`)
+			.post(`/barbers/${barberShopId}`)
 			.set('Authorization', `Bearer ${adminToken}`)
 			.send({
 				name: 'Barber One',
@@ -71,7 +71,7 @@ describe('[PATCH] /users/:barberShopId/barbers/:id', () => {
 		});
 
 		const response = await request(app)
-			.patch(`/users/${barberShopId}/barbers/${barber?.id}`)
+			.patch(`/barbers/${barberShopId}/${barber?.id}`)
 			.set('Authorization', `Bearer ${adminToken}`)
 			.send({
 				name: 'Updated Barber',
@@ -93,7 +93,7 @@ describe('[PATCH] /users/:barberShopId/barbers/:id', () => {
 	it('should not allow updating a barber with an email that already exists', async () => {
 		// Create another barber to test email conflict
 		await request(app)
-			.post(`/users/${barberShopId}/barbers`)
+			.post(`/barbers/${barberShopId}`)
 			.set('Authorization', `Bearer ${adminToken}`)
 			.send({
 				name: 'Barber Two',
@@ -106,7 +106,7 @@ describe('[PATCH] /users/:barberShopId/barbers/:id', () => {
 		});
 
 		const response = await request(app)
-			.patch(`/users/${barberShopId}/barbers/${barber?.id}`)
+			.patch(`/barbers/${barberShopId}/${barber?.id}`)
 			.set('Authorization', `Bearer ${adminToken}`)
 			.send({
 				email: 'updatedbarber@test.com', // Try to update to an existing email
@@ -130,7 +130,7 @@ describe('[PATCH] /users/:barberShopId/barbers/:id', () => {
 		const nonAdminToken = nonAdminResponse.body.token;
 
 		const response = await request(app)
-			.patch(`/users/${barberShopId}/barbers/${barber?.id}`)
+			.patch(`/barbers/${barberShopId}/${barber?.id}`)
 			.set('Authorization', `Bearer ${nonAdminToken}`)
 			.send({
 				name: 'Should Not Update',

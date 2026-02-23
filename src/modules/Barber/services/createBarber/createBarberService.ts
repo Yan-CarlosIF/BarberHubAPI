@@ -1,4 +1,4 @@
-import type { ICreateBarberDTO } from '@modules/User/dtos/IcreateBarberDTO';
+import type { ICreateBarberDTO } from '@modules/Barber/dtos/ICreateBarberDTO';
 import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { AppError } from '@shared/errors/appError';
 import { hash } from 'bcrypt';
