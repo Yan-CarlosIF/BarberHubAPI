@@ -14,10 +14,7 @@ export interface IScheduleRepository {
 	findAllByBarberShopId(barberShopId: string): Promise<Schedule[]>;
 	findAllByClientId(clientId: string): Promise<Schedule[]>;
 	findAllByBarberId(barberId: string): Promise<Schedule[]>;
-	findAllByBarberIdAndDate(
-		barberId: string,
-		date: string,
-	): Promise<Schedule[]>;
+	findAllByBarberIdAndDate(barberId: string, date: string): Promise<Schedule[]>;
 	updateStatus(data: IUpdateScheduleStatusDTO): Promise<void>;
 	delete(id: string): Promise<void>;
 }

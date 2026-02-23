@@ -58,15 +58,11 @@ export class ScheduleRepositoryInMemory implements IScheduleRepository {
 	}
 
 	async findAllByClientId(clientId: string): Promise<Schedule[]> {
-		return this.schedules.filter(
-			(schedule) => schedule.clientId === clientId,
-		);
+		return this.schedules.filter((schedule) => schedule.clientId === clientId);
 	}
 
 	async findAllByBarberId(barberId: string): Promise<Schedule[]> {
-		return this.schedules.filter(
-			(schedule) => schedule.barberId === barberId,
-		);
+		return this.schedules.filter((schedule) => schedule.barberId === barberId);
 	}
 
 	async findAllByBarberIdAndDate(

@@ -54,9 +54,9 @@ describe('CancelScheduleService', () => {
 
 		await cancelScheduleService.execute(schedule.id);
 
-		await expect(
-			cancelScheduleService.execute(schedule.id),
-		).rejects.toEqual(new AppError('Schedule is already canceled', 400));
+		await expect(cancelScheduleService.execute(schedule.id)).rejects.toEqual(
+			new AppError('Schedule is already canceled', 400),
+		);
 	});
 
 	it('should not be able to cancel a completed schedule', async () => {
@@ -77,8 +77,8 @@ describe('CancelScheduleService', () => {
 			status: 'COMPLETED',
 		});
 
-		await expect(
-			cancelScheduleService.execute(schedule.id),
-		).rejects.toEqual(new AppError('Cannot cancel a completed schedule', 400));
+		await expect(cancelScheduleService.execute(schedule.id)).rejects.toEqual(
+			new AppError('Cannot cancel a completed schedule', 400),
+		);
 	});
 });

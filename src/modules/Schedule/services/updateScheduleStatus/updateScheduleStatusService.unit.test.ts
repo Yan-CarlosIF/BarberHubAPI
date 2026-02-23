@@ -115,8 +115,6 @@ describe('UpdateScheduleStatusService', () => {
 				id: schedule.id,
 				status: 'NO_SHOW',
 			}),
-		).rejects.toEqual(
-			new AppError('Cannot update a completed schedule', 400),
-		);
+		).rejects.toEqual(new AppError('Cannot update a completed schedule', 400));
 	});
 });

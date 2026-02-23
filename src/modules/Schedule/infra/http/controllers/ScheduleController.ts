@@ -16,11 +16,7 @@ import { z } from 'zod';
 
 export class ScheduleController {
 	async create(
-		request: Request<
-			{ barberShopId: string },
-			unknown,
-			ICreateScheduleBodyDTO
-		>,
+		request: Request<{ barberShopId: string }, unknown, ICreateScheduleBodyDTO>,
 		response: Response,
 	) {
 		const { barberShopId } = z
@@ -139,8 +135,7 @@ export class ScheduleController {
 			ListSchedulesByBarberService,
 		);
 
-		const schedules =
-			await listSchedulesByBarberService.execute(barberId);
+		const schedules = await listSchedulesByBarberService.execute(barberId);
 
 		return response.status(200).json(schedules);
 	}

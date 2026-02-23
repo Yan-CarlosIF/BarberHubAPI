@@ -1,7 +1,4 @@
-import type {
-	Schedule as ISchedule,
-	$Enums,
-} from '@prisma/client';
+import type { $Enums, Schedule as ISchedule } from '@prisma/client';
 
 export class Schedule implements ISchedule {
 	id: string;

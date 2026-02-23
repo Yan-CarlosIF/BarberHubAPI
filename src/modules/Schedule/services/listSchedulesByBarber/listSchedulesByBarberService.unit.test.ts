@@ -45,15 +45,13 @@ describe('ListSchedulesByBarberService', () => {
 			endTime: '10:30',
 		});
 
-		const schedules =
-			await listSchedulesByBarberService.execute('barberId');
+		const schedules = await listSchedulesByBarberService.execute('barberId');
 
 		expect(schedules).toHaveLength(2);
 	});
 
 	it('should return an empty array if no schedules found', async () => {
-		const schedules =
-			await listSchedulesByBarberService.execute('barberId');
+		const schedules = await listSchedulesByBarberService.execute('barberId');
 
 		expect(schedules).toHaveLength(0);
 	});

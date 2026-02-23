@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 
-import { ServiceRepositoryInMemory } from '@modules/Service/repositories/inMemory/ServiceRepositoryInMemory';
 import { ScheduleRepositoryInMemory } from '@modules/Schedule/repositories/inMemory/ScheduleRepositoryInMemory';
-import { AppError } from '@shared/errors/appError';
+import { ServiceRepositoryInMemory } from '@modules/Service/repositories/inMemory/ServiceRepositoryInMemory';
 import { Decimal } from '@prisma/client/runtime/client';
+import { AppError } from '@shared/errors/appError';
 import { CreateScheduleService } from './createScheduleService';
 
 describe('CreateScheduleService', () => {

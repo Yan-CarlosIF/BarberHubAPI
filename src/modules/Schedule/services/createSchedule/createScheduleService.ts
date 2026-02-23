@@ -1,6 +1,6 @@
-import type { IServiceRepository } from '@modules/Service/repositories/IServiceRepository';
 import type { ICreateScheduleBodyDTO } from '@modules/Schedule/dtos/ICreateScheduleDTO';
 import type { IScheduleRepository } from '@modules/Schedule/repositories/IScheduleRepository';
+import type { IServiceRepository } from '@modules/Service/repositories/IServiceRepository';
 import { AppError } from '@shared/errors/appError';
 import { inject, injectable } from 'tsyringe';
 

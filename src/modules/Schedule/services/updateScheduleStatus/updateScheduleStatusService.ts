@@ -1,5 +1,5 @@
-import type { IScheduleRepository } from '@modules/Schedule/repositories/IScheduleRepository';
 import type { IUpdateScheduleStatusDTO } from '@modules/Schedule/dtos/IUpdateScheduleStatusDTO';
+import type { IScheduleRepository } from '@modules/Schedule/repositories/IScheduleRepository';
 import { AppError } from '@shared/errors/appError';
 import { inject, injectable } from 'tsyringe';
 
