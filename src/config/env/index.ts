@@ -8,6 +8,7 @@ const envSchema = z.object({
 	DATABASE_URL: z.url(),
 	REDIS_URL: z.url(),
 	JWT_SECRET: z.string().min(32, 'JWT secret must be at least 32 characters'),
+	FRONTEND_URL: z.url().default('http://localhost:3000'),
 });
 
 function validate() {
@@ -16,6 +17,7 @@ function validate() {
 		DATABASE_URL: process.env.DATABASE_URL,
 		REDIS_URL: process.env.REDIS_URL,
 		JWT_SECRET: process.env.JWT_SECRET,
+		FRONTEND_URL: process.env.FRONTEND_URL,
 	});
 
 	if (!parse.success) {
