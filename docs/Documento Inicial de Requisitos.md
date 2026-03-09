@@ -167,20 +167,42 @@ Usuário responsável pela administração da plataforma como um todo.
 
 ## 5. Requisitos Funcionais
 
+### 5.1 Autenticação e Controle de Acesso
+
 | ID     | Requisito                                                                                         | Prioridade |
 | ------ | ------------------------------------------------------------------------------------------------- | ---------- |
 | RF01   | O sistema deve permitir cadastro de clientes com nome, e-mail, senha, telefone e data de nascimento | Alta       |
 | RF02   | O sistema deve permitir login de usuários com e-mail e senha, retornando um token JWT              | Alta       |
 | RF03   | O sistema deve possuir controle de acesso baseado em papéis (CLIENT, BARBER, ADMIN, SUPER_ADMIN)   | Alta       |
+
+### 5.2 Gerenciamento de Barbearias e Administradores
+
+| ID     | Requisito                                                                                         | Prioridade |
+| ------ | ------------------------------------------------------------------------------------------------- | ---------- |
 | RF04   | O SUPER_ADMIN deve poder criar, listar e deletar barbearias                                        | Alta       |
 | RF05   | O SUPER_ADMIN deve poder criar administradores vinculados a uma barbearia                          | Alta       |
+
+### 5.3 Gerenciamento de Barbeiros e Serviços
+
+| ID     | Requisito                                                                                         | Prioridade |
+| ------ | ------------------------------------------------------------------------------------------------- | ---------- |
 | RF06   | O ADMIN deve poder cadastrar, editar e remover barbeiros da sua barbearia                          | Alta       |
 | RF07   | O ADMIN deve poder cadastrar, editar, ativar/desativar e remover serviços                          | Alta       |
 | RF08   | Cada serviço deve possuir nome, descrição, preço e duração em minutos                              | Alta       |
 | RF09   | O sistema deve permitir associar serviços específicos a barbeiros específicos                       | Média      |
+
+### 5.4 Disponibilidade e Bloqueios de Horário
+
+| ID     | Requisito                                                                                         | Prioridade |
+| ------ | ------------------------------------------------------------------------------------------------- | ---------- |
 | RF10   | O ADMIN deve poder definir a disponibilidade semanal de cada barbeiro (dia da semana, hora início, hora fim) | Alta |
 | RF11   | O ADMIN deve poder criar bloqueios de horário para barbeiros (data, hora início, hora fim)          | Alta       |
 | RF12   | O cliente deve poder visualizar horários disponíveis em tempo real                                  | Alta       |
+
+### 5.5 Agendamentos
+
+| ID     | Requisito                                                                                         | Prioridade |
+| ------ | ------------------------------------------------------------------------------------------------- | ---------- |
 | RF13   | O cliente deve poder realizar agendamentos selecionando barbearia, barbeiro, serviço, data e horário | Alta     |
 | RF14   | O sistema deve impedir conflitos de horário automaticamente                                         | Alta       |
 | RF15   | O cliente deve poder cancelar ou reagendar agendamentos                                             | Alta       |
@@ -188,9 +210,19 @@ Usuário responsável pela administração da plataforma como um todo.
 | RF17   | O sistema deve registrar o status do agendamento (SCHEDULED, COMPLETED, CANCELED, NO_SHOW)          | Alta       |
 | RF18   | O barbeiro deve poder visualizar apenas seus próprios agendamentos                                  | Média      |
 | RF19   | O ADMIN deve poder listar agendamentos por barbearia e por barbeiro                                 | Alta       |
+
+### 5.6 Notificações e Comunicação
+
+| ID     | Requisito                                                                                         | Prioridade |
+| ------ | ------------------------------------------------------------------------------------------------- | ---------- |
 | RF20   | O sistema deve enviar confirmação de agendamento ao cliente                                         | Média      |
 | RF21   | O sistema deve enviar lembretes automáticos antes do horário                                        | Baixa      |
 | RF22   | O sistema deve notificar alterações ou cancelamentos                                                | Média      |
+
+### 5.7 Interface e Dashboard
+
+| ID     | Requisito                                                                                         | Prioridade |
+| ------ | ------------------------------------------------------------------------------------------------- | ---------- |
 | RF23   | A landing page deve exibir serviços, equipe, preços e botões de ação                                | Alta       |
 | RF24   | O ADMIN deve poder visualizar métricas de atendimentos no dashboard                                 | Baixa      |
 
@@ -198,23 +230,68 @@ Usuário responsável pela administração da plataforma como um todo.
 
 ## 6. Requisitos Não Funcionais
 
-| ID     | Requisito                                                                                          | Categoria        |
-| ------ | -------------------------------------------------------------------------------------------------- | ---------------- |
-| RNF01  | Senhas devem ser armazenadas com hash bcrypt (mínimo 10 rounds)                                    | Segurança        |
-| RNF02  | O sistema deve utilizar autenticação via JWT (Bearer Token)                                        | Segurança        |
-| RNF03  | Deve existir controle de permissões por perfil (middleware de auth e admin)                         | Segurança        |
-| RNF04  | Validação de dados de entrada via Zod em todas as rotas                                            | Segurança        |
-| RNF05  | Consultas de horários devem responder em menos de 500ms                                            | Performance      |
-| RNF06  | O sistema deve suportar múltiplos usuários simultâneos                                             | Performance      |
-| RNF07  | A arquitetura deve suportar múltiplas barbearias (multi-tenant por barberShopId)                    | Escalabilidade   |
-| RNF08  | Os dados de cada barbearia devem ser isolados logicamente                                          | Escalabilidade   |
-| RNF09  | O backend deve ser containerizado via Docker                                                       | Infraestrutura   |
-| RNF10  | O banco de dados deve ser PostgreSQL                                                               | Infraestrutura   |
-| RNF11  | Interface web responsiva e intuitiva                                                               | Usabilidade      |
-| RNF12  | O aplicativo mobile deve funcionar em Android e iOS                                                | Usabilidade      |
-| RNF13  | A API deve possuir documentação OpenAPI acessível em /docs                                         | Manutenibilidade |
-| RNF14  | O código deve seguir padrões definidos pelo Biome (linter/formatter)                               | Manutenibilidade |
-| RNF15  | O sistema deve possuir testes unitários e e2e (Vitest + Supertest)                                 | Qualidade        |
+### 6.1 Usabilidade
+
+| ID     | Requisito                                                                                          |
+| ------ | -------------------------------------------------------------------------------------------------- |
+| RNF01  | A interface web deve ser responsiva e intuitiva, adaptando-se a diferentes resoluções de tela       |
+| RNF02  | O aplicativo mobile deve funcionar em Android (10+) e iOS (14+)                                    |
+| RNF03  | O sistema deve fornecer mensagens de erro claras e orientativas ao usuário                          |
+| RNF04  | A navegação entre funcionalidades deve exigir no máximo 3 cliques                                   |
+
+### 6.2 Confiabilidade
+
+| ID     | Requisito                                                                                          |
+| ------ | -------------------------------------------------------------------------------------------------- |
+| RNF05  | O sistema deve garantir disponibilidade mínima de 99% em horário comercial                          |
+| RNF06  | O sistema deve impedir conflitos de agendamento mesmo sob acessos concorrentes                       |
+| RNF07  | Os dados de cada barbearia devem ser isolados logicamente (multi-tenant por barberShopId)            |
+| RNF08  | O sistema deve possuir testes unitários e e2e (Vitest + Supertest) para garantir integridade         |
+
+### 6.3 Desempenho
+
+| ID     | Requisito                                                                                          |
+| ------ | -------------------------------------------------------------------------------------------------- |
+| RNF09  | Consultas de horários disponíveis devem responder em menos de 500ms                                 |
+| RNF10  | O sistema deve suportar múltiplos usuários simultâneos sem degradação perceptível                    |
+| RNF11  | A arquitetura deve suportar múltiplas barbearias concorrentes (escalabilidade horizontal)            |
+
+### 6.4 Segurança
+
+| ID     | Requisito                                                                                          |
+| ------ | -------------------------------------------------------------------------------------------------- |
+| RNF12  | Senhas devem ser armazenadas com hash bcrypt (mínimo 10 rounds)                                    |
+| RNF13  | O sistema deve utilizar autenticação via JWT (Bearer Token)                                        |
+| RNF14  | Deve existir controle de permissões por perfil (middleware de auth e admin)                         |
+| RNF15  | Validação de dados de entrada via Zod em todas as rotas da API                                     |
+| RNF16  | Rotas protegidas devem exigir token JWT válido no header Authorization                              |
+
+### 6.5 Distribuição
+
+| ID     | Requisito                                                                                          |
+| ------ | -------------------------------------------------------------------------------------------------- |
+| RNF17  | O backend deve ser containerizado via Docker e orquestrado com Docker Compose                       |
+| RNF18  | O sistema deve ser composto por três camadas independentes: API, Web e Mobile                        |
+| RNF19  | A comunicação entre frontend e backend deve ocorrer exclusivamente via API REST                      |
+
+### 6.6 Padrões
+
+| ID     | Requisito                                                                                          |
+| ------ | -------------------------------------------------------------------------------------------------- |
+| RNF20  | A API deve possuir documentação OpenAPI 3.1 acessível em /docs                                     |
+| RNF21  | O código deve seguir padrões definidos pelo Biome (linter/formatter)                               |
+| RNF22  | O backend deve seguir arquitetura modular com injeção de dependências (tsyringe)                    |
+| RNF23  | As migrações de banco devem ser versionadas via Prisma Migrate                                      |
+
+### 6.7 Hardware e Software
+
+| ID     | Requisito                                                                                          |
+| ------ | -------------------------------------------------------------------------------------------------- |
+| RNF24  | O servidor deve executar em ambiente com Node.js 18+ e sistema operacional Linux                    |
+| RNF25  | O banco de dados deve ser PostgreSQL 14+                                                            |
+| RNF26  | O ambiente de desenvolvimento requer pnpm, Docker e Docker Compose instalados                       |
+| RNF27  | O cliente web requer navegador com suporte a JavaScript moderno (ES2020+)                           |
+| RNF28  | O cliente mobile requer dispositivo com Android 10+ ou iOS 14+                                      |
 
 ---
 
