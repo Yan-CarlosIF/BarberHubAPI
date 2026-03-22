@@ -8,8 +8,8 @@ export const userRoutes = Router();
 const userController = new UserController();
 
 userRoutes.post(
-	'/:barberShopId/admin',
-	authMiddleware,
-	superAdminMiddleware,
-	userController.createAdminHandle,
+  '/:barberShopIdOrSlug/admin',
+  authMiddleware,
+  superAdminMiddleware,
+  userController.createAdminHandle,
 );

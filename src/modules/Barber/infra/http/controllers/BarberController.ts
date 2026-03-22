@@ -1,20 +1,23 @@
 import {
-	assignBarberServiceBodySchema,
-	type IAssignBarberServiceBodyDTO,
+  assignBarberServiceBodySchema,
+  type IAssignBarberServiceBodyDTO,
 } from '@modules/Barber/dtos/IAssignBarberServiceDTO';
 import {
-	createBarberAvailabilityBodySchema,
-	type ICreateBarberAvailabilityBodyDTO,
+  createBarberAvailabilityBodySchema,
+  type ICreateBarberAvailabilityBodyDTO,
 } from '@modules/Barber/dtos/ICreateBarberAvailabilityDTO';
 import {
-	createBarberBlockBodySchema,
-	type ICreateBarberBlockBodyDTO,
+  createBarberBlockBodySchema,
+  type ICreateBarberBlockBodyDTO,
 } from '@modules/Barber/dtos/ICreateBarberBlockDTO';
 import {
-	createBarberSchema,
-	type ICreateBarberDTO,
+  createBarberSchema,
+  type ICreateBarberDTO,
 } from '@modules/Barber/dtos/ICreateBarberDTO';
-import type { IUpdateBarberDTO } from '@modules/Barber/dtos/IUpdateBarberDTO';
+import {
+  type IUpdateBarberDTO,
+  updateBarberSchema,
+} from '@modules/Barber/dtos/IUpdateBarberDTO';
 import { AssignBarberServiceService } from '@modules/Barber/services/assignBarberService/assignBarberServiceService';
 import { CreateBarberService } from '@modules/Barber/services/createBarber/createBarberService';
 import { CreateBarberBlockService } from '@modules/Barber/services/createBarberBlock/createBarberBlockService';
@@ -34,250 +37,258 @@ import { z } from 'zod';
 
 const barberIdParam = z.object({ barberId: z.uuid() });
 const barberAndBlockParams = z.object({
-	barberId: z.uuid(),
-	blockId: z.uuid(),
+  barberId: z.uuid(),
+  blockId: z.uuid(),
 });
 const barberAndServiceParams = z.object({
-	barberId: z.uuid(),
-	serviceId: z.uuid(),
+  barberId: z.uuid(),
+  serviceId: z.uuid(),
 });
 
 export class BarberController {
-	// ── Barber CRUD ───────────────────────────────────────────
+  // ── Barber CRUD ───────────────────────────────────────────
 
-	async createBarberHandle(
-		request: Request<
-			Pick<ICreateBarberDTO, 'barberShopId'>,
-			unknown,
-			Omit<ICreateBarberDTO, 'isActive' | 'barberShopIdOrSlug'>
-		>,
-		response: Response,
-	) {
-		const { name, email, password, specialty } = createBarberSchema
-			.omit({ isActive: true, barberShopId: true })
-			.parse(request.body);
+  async createBarberHandle(
+    request: Request<
+      { barberShopIdOrSlug: string },
+      unknown,
+      Omit<ICreateBarberDTO, 'isActive' | 'barberShopId'>
+    >,
+    response: Response,
+  ) {
+    const { name, email, password, specialty } = createBarberSchema
+      .omit({ isActive: true, barberShopId: true })
+      .parse(request.body);
 
-		const { barberShopIdOrSlug } = z
-			.object({
-				barberShopIdOrSlug: z
-					.string('Barbershop ID is invalid')
-					.nonempty('Barbershop ID is required'),
-			})
-			.parse(request.params);
+    const { barberShopIdOrSlug } = z
+      .object({
+        barberShopIdOrSlug: z
+          .string('Barbershop ID is invalid')
+          .nonempty('Barbershop ID is required'),
+      })
+      .parse(request.params);
 
-		const createBarberService = container.resolve(CreateBarberService);
+    const createBarberService = container.resolve(CreateBarberService);
 
-		await createBarberService.execute({
-			name,
-			barberShopId: barberShopIdOrSlug,
-			email,
-			password,
-			isActive: true,
-			specialty,
-		});
+    await createBarberService.execute({
+      name,
+      barberShopId: barberShopIdOrSlug,
+      email,
+      password,
+      isActive: true,
+      specialty,
+    });
 
-		return response
-			.status(201)
-			.json({ message: 'Barber registered successfully' });
-	}
+    return response
+      .status(201)
+      .json({ message: 'Barber registered successfully' });
+  }
 
-	async deleteBarberHandle(
-		request: Request<{ barberShopIdOrSlug: string; id: string }>,
-		response: Response,
-	) {
-		const { id } = z
-			.object({
-				barberShopIdOrSlug: z
-					.string('Barbershop ID is invalid')
-					.nonempty('Barbershop ID is required'),
-				id: z.uuid('Barber ID is invalid'),
-			})
-			.parse(request.params);
+  async deleteBarberHandle(
+    request: Request<{ barberShopIdOrSlug: string; id: string }>,
+    response: Response,
+  ) {
+    const { id } = z
+      .object({
+        barberShopIdOrSlug: z
+          .string('Barbershop ID is invalid')
+          .nonempty('Barbershop ID is required'),
+        id: z.uuid('Barber ID is invalid'),
+      })
+      .parse(request.params);
 
-		const deleteBarberService = container.resolve(DeleteBarberService);
+    const deleteBarberService = container.resolve(DeleteBarberService);
 
-		await deleteBarberService.execute(id);
+    await deleteBarberService.execute(id);
 
-		return response.status(204).send();
-	}
+    return response.status(204).send();
+  }
 
-	async updateBarberHandle(
-		request: Request<
-			{ barberShopIdOrSlug: string; id: string },
-			unknown,
-			IUpdateBarberDTO
-		>,
-		response: Response,
-	) {
-		const { id } = z
-			.object({
-				barberShopIdOrSlug: z
-					.string('Barbershop ID or Slug is invalid')
-					.nonempty('Barbershop ID or Slug is required'),
-				id: z.uuid('Barber ID is invalid'),
-			})
-			.parse(request.params);
+  async updateBarberHandle(
+    request: Request<
+      { barberShopIdOrSlug: string; id: string },
+      unknown,
+      Omit<IUpdateBarberDTO, 'id'>
+    >,
+    response: Response,
+  ) {
+    const { id } = z
+      .object({
+        barberShopIdOrSlug: z
+          .string('Barbershop ID or Slug is invalid')
+          .nonempty('Barbershop ID or Slug is required'),
+        id: z.uuid('Barber ID is invalid'),
+      })
+      .parse(request.params);
 
-		const updateBarberService = container.resolve(UpdateBarberService);
+    const { isActive, email, name, password, specialty } = updateBarberSchema
+      .omit({ id: true })
+      .parse(request.body);
 
-		await updateBarberService.execute({
-			...request.body,
-			id,
-		});
+    const updateBarberService = container.resolve(UpdateBarberService);
 
-		return response.status(204).send();
-	}
+    await updateBarberService.execute({
+      isActive,
+      email,
+      name,
+      password,
+      specialty,
+      id,
+    });
 
-	async listBarbersHandle(
-		request: Request<{ barberShopIdOrSlug: string }>,
-		response: Response,
-	) {
-		const { barberShopIdOrSlug } = z
-			.object({
-				barberShopIdOrSlug: z
-					.string('Barbershop Id or Slug is invalid')
-					.nonempty('Barbershop Id or Slug is required'),
-			})
-			.parse(request.params);
+    return response.status(204).send();
+  }
 
-		const listBarbersService = container.resolve(ListBarbersService);
+  async listBarbersHandle(
+    request: Request<{ barberShopIdOrSlug: string }>,
+    response: Response,
+  ) {
+    const { barberShopIdOrSlug } = z
+      .object({
+        barberShopIdOrSlug: z
+          .string('Barbershop Id or Slug is invalid')
+          .nonempty('Barbershop Id or Slug is required'),
+      })
+      .parse(request.params);
 
-		const barbers = await listBarbersService.execute(barberShopIdOrSlug);
+    const listBarbersService = container.resolve(ListBarbersService);
 
-		return response.status(200).json(barbers);
-	}
+    const barbers = await listBarbersService.execute(barberShopIdOrSlug);
 
-	// ── Availability ──────────────────────────────────────────
+    return response.status(200).json(barbers);
+  }
 
-	async setAvailability(
-		request: Request<
-			{ barberId: string },
-			unknown,
-			ICreateBarberAvailabilityBodyDTO
-		>,
-		response: Response,
-	) {
-		const { barberId } = barberIdParam.parse(request.params);
-		const { weekDay, startTime, endTime } =
-			createBarberAvailabilityBodySchema.parse(request.body);
+  // ── Availability ──────────────────────────────────────────
 
-		const service = container.resolve(SetBarberAvailabilityService);
+  async setAvailability(
+    request: Request<
+      { barberId: string },
+      unknown,
+      ICreateBarberAvailabilityBodyDTO
+    >,
+    response: Response,
+  ) {
+    const { barberId } = barberIdParam.parse(request.params);
+    const { weekDay, startTime, endTime } =
+      createBarberAvailabilityBodySchema.parse(request.body);
 
-		await service.execute({ barberId, weekDay, startTime, endTime });
+    const service = container.resolve(SetBarberAvailabilityService);
 
-		return response
-			.status(201)
-			.json({ message: 'Availability set successfully' });
-	}
+    await service.execute({ barberId, weekDay, startTime, endTime });
 
-	async listAvailability(
-		request: Request<{ barberId: string }>,
-		response: Response,
-	) {
-		const { barberId } = barberIdParam.parse(request.params);
+    return response
+      .status(201)
+      .json({ message: 'Availability set successfully' });
+  }
 
-		const service = container.resolve(ListBarberAvailabilityService);
-		const availabilities = await service.execute(barberId);
+  async listAvailability(
+    request: Request<{ barberId: string }>,
+    response: Response,
+  ) {
+    const { barberId } = barberIdParam.parse(request.params);
 
-		return response.status(200).json(availabilities);
-	}
+    const service = container.resolve(ListBarberAvailabilityService);
+    const availabilities = await service.execute(barberId);
 
-	async deleteAvailability(
-		request: Request<{ barberId: string }>,
-		response: Response,
-	) {
-		const { barberId } = barberIdParam.parse(request.params);
+    return response.status(200).json(availabilities);
+  }
 
-		const service = container.resolve(DeleteBarberAvailabilityService);
-		await service.execute(barberId);
+  async deleteAvailability(
+    request: Request<{ barberId: string }>,
+    response: Response,
+  ) {
+    const { barberId } = barberIdParam.parse(request.params);
 
-		return response.status(204).send();
-	}
+    const service = container.resolve(DeleteBarberAvailabilityService);
+    await service.execute(barberId);
 
-	// ── Blocks ────────────────────────────────────────────────
+    return response.status(204).send();
+  }
 
-	async createBlock(
-		request: Request<{ barberId: string }, unknown, ICreateBarberBlockBodyDTO>,
-		response: Response,
-	) {
-		const { barberId } = barberIdParam.parse(request.params);
-		const { date, startTime, endTime } = createBarberBlockBodySchema.parse(
-			request.body,
-		);
+  // ── Blocks ────────────────────────────────────────────────
 
-		const service = container.resolve(CreateBarberBlockService);
+  async createBlock(
+    request: Request<{ barberId: string }, unknown, ICreateBarberBlockBodyDTO>,
+    response: Response,
+  ) {
+    const { barberId } = barberIdParam.parse(request.params);
+    const { date, startTime, endTime } = createBarberBlockBodySchema.parse(
+      request.body,
+    );
 
-		await service.execute({ barberId, date, startTime, endTime });
+    const service = container.resolve(CreateBarberBlockService);
 
-		return response.status(201).json({ message: 'Block created successfully' });
-	}
+    await service.execute({ barberId, date, startTime, endTime });
 
-	async listBlocks(request: Request<{ barberId: string }>, response: Response) {
-		const { barberId } = barberIdParam.parse(request.params);
+    return response.status(201).json({ message: 'Block created successfully' });
+  }
 
-		const service = container.resolve(ListBarberBlocksService);
-		const blocks = await service.execute(barberId);
+  async listBlocks(request: Request<{ barberId: string }>, response: Response) {
+    const { barberId } = barberIdParam.parse(request.params);
 
-		return response.status(200).json(blocks);
-	}
+    const service = container.resolve(ListBarberBlocksService);
+    const blocks = await service.execute(barberId);
 
-	async deleteBlock(
-		request: Request<{ barberId: string; blockId: string }>,
-		response: Response,
-	) {
-		const { barberId, blockId } = barberAndBlockParams.parse(request.params);
+    return response.status(200).json(blocks);
+  }
 
-		const service = container.resolve(DeleteBarberBlockService);
-		await service.execute(barberId, blockId);
+  async deleteBlock(
+    request: Request<{ barberId: string; blockId: string }>,
+    response: Response,
+  ) {
+    const { barberId, blockId } = barberAndBlockParams.parse(request.params);
 
-		return response.status(204).send();
-	}
+    const service = container.resolve(DeleteBarberBlockService);
+    await service.execute(barberId, blockId);
 
-	// ── BarberService (assign/unassign services) ─────────────
+    return response.status(204).send();
+  }
 
-	async assignService(
-		request: Request<
-			{ barberId: string },
-			unknown,
-			IAssignBarberServiceBodyDTO
-		>,
-		response: Response,
-	) {
-		const { barberId } = barberIdParam.parse(request.params);
-		const { serviceId } = assignBarberServiceBodySchema.parse(request.body);
+  // ── BarberService (assign/unassign services) ─────────────
 
-		const service = container.resolve(AssignBarberServiceService);
+  async assignService(
+    request: Request<
+      { barberId: string },
+      unknown,
+      IAssignBarberServiceBodyDTO
+    >,
+    response: Response,
+  ) {
+    const { barberId } = barberIdParam.parse(request.params);
+    const { serviceId } = assignBarberServiceBodySchema.parse(request.body);
 
-		await service.execute({ barberId, serviceId });
+    const service = container.resolve(AssignBarberServiceService);
 
-		return response
-			.status(201)
-			.json({ message: 'Service assigned successfully' });
-	}
+    await service.execute({ barberId, serviceId });
 
-	async unassignService(
-		request: Request<{ barberId: string; serviceId: string }>,
-		response: Response,
-	) {
-		const { barberId, serviceId } = barberAndServiceParams.parse(
-			request.params,
-		);
+    return response
+      .status(201)
+      .json({ message: 'Service assigned successfully' });
+  }
 
-		const service = container.resolve(UnassignBarberServiceService);
-		await service.execute(barberId, serviceId);
+  async unassignService(
+    request: Request<{ barberId: string; serviceId: string }>,
+    response: Response,
+  ) {
+    const { barberId, serviceId } = barberAndServiceParams.parse(
+      request.params,
+    );
 
-		return response.status(204).send();
-	}
+    const service = container.resolve(UnassignBarberServiceService);
+    await service.execute(barberId, serviceId);
 
-	async listServices(
-		request: Request<{ barberId: string }>,
-		response: Response,
-	) {
-		const { barberId } = barberIdParam.parse(request.params);
+    return response.status(204).send();
+  }
 
-		const service = container.resolve(ListBarberServicesService);
-		const services = await service.execute(barberId);
+  async listServices(
+    request: Request<{ barberId: string }>,
+    response: Response,
+  ) {
+    const { barberId } = barberIdParam.parse(request.params);
 
-		return response.status(200).json(services);
-	}
+    const service = container.resolve(ListBarberServicesService);
+    const services = await service.execute(barberId);
+
+    return response.status(200).json(services);
+  }
 }

@@ -3,7 +3,7 @@ import { app } from '@shared/infra/http/app';
 import { prisma } from '@shared/infra/prisma/client';
 import request from 'supertest';
 
-describe('[DELETE] /barbers/:barberShopId/:id', () => {
+describe('[DELETE] /barbers/:barberShopIdOrSlug/:id', () => {
   let superAdminToken: string;
   let adminToken: string;
   let barberShopId: string;
@@ -82,7 +82,7 @@ describe('[DELETE] /barbers/:barberShopId/:id', () => {
 
   it('should be able to dele a barber with barberShop slug', async () => {
     await request(app)
-      .post(`/barbers/${barberShopId}`)
+      .post(`/barbers/${barberShopSlug}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
         name: 'Barber to Delete',
