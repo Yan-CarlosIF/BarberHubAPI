@@ -969,18 +969,18 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    '/schedules/{barberShopId}': {
+    '/schedules/{barberShopIdOrSlug}': {
       post: {
         summary: 'Criar Agendamento',
         tags: ['Schedule'],
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
           },
         ],
         requestBody: {
@@ -1063,11 +1063,11 @@ export const openApiDocument = createDocument({
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
           },
         ],
         responses: {
@@ -1187,18 +1187,18 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    '/schedules/{barberShopId}/barber/{barberId}': {
+    '/schedules/{barberShopIdOrSlug}/barber/{barberId}': {
       get: {
         summary: 'Listar Agendamentos por Barbeiro',
         tags: ['Schedule'],
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
           },
           {
             name: 'barberId',
@@ -1257,18 +1257,18 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    '/schedules/{barberShopId}/{id}/cancel': {
+    '/schedules/{barberShopIdOrSlug}/{id}/cancel': {
       patch: {
         summary: 'Cancelar Agendamento',
         tags: ['Schedule'],
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
           },
           {
             name: 'id',
@@ -1317,18 +1317,18 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    '/schedules/{barberShopId}/{id}/status': {
+    '/schedules/{barberShopIdOrSlug}/{id}/status': {
       patch: {
         summary: 'Atualizar Status do Agendamento',
         tags: ['Schedule'],
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
           },
           {
             name: 'id',

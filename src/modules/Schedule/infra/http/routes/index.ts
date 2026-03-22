@@ -8,44 +8,44 @@ const scheduleController = new ScheduleController();
 
 // Client creates a new schedule
 scheduleRoutes.post(
-	'/:barberShopId',
-	authMiddleware,
-	scheduleController.create,
+  '/:barberShopIdOrSlug',
+  authMiddleware,
+  scheduleController.create,
 );
 
 // List schedules for the authenticated client
 scheduleRoutes.get(
-	'/my-schedules',
-	authMiddleware,
-	scheduleController.listByClient,
+  '/my-schedules',
+  authMiddleware,
+  scheduleController.listByClient,
 );
 
 // List all schedules of a barber shop (admin only)
 scheduleRoutes.get(
-	'/:barberShopId',
-	authMiddleware,
-	adminMiddleware,
-	scheduleController.listByBarberShop,
+  '/:barberShopIdOrSlug',
+  authMiddleware,
+  adminMiddleware,
+  scheduleController.listByBarberShop,
 );
 
 // List all schedules of a specific barber within a barber shop
 scheduleRoutes.get(
-	'/:barberShopId/barber/:barberId',
-	authMiddleware,
-	scheduleController.listByBarber,
+  '/:barberShopIdOrSlug/barber/:barberId',
+  authMiddleware,
+  scheduleController.listByBarber,
 );
 
 // Cancel a schedule
 scheduleRoutes.patch(
-	'/:barberShopId/:id/cancel',
-	authMiddleware,
-	scheduleController.cancel,
+  '/:barberShopIdOrSlug/:id/cancel',
+  authMiddleware,
+  scheduleController.cancel,
 );
 
 // Update schedule status (admin / barber: COMPLETED, NO_SHOW)
 scheduleRoutes.patch(
-	'/:barberShopId/:id/status',
-	authMiddleware,
-	adminMiddleware,
-	scheduleController.updateStatus,
+  '/:barberShopIdOrSlug/:id/status',
+  authMiddleware,
+  adminMiddleware,
+  scheduleController.updateStatus,
 );
