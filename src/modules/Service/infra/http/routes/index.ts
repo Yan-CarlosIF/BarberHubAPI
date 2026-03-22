@@ -7,24 +7,24 @@ export const serviceRoutes = Router();
 const serviceController = new ServiceController();
 
 serviceRoutes.post(
-	'/:barberShopId',
-	authMiddleware,
-	adminMiddleware,
-	serviceController.create,
+  '/:barberShopIdOrSlug',
+  authMiddleware,
+  adminMiddleware,
+  serviceController.create,
 );
 
-serviceRoutes.get('/:barberShopId', serviceController.list);
+serviceRoutes.get('/:barberShopIdOrSlug', serviceController.list);
 
 serviceRoutes.patch(
-	'/:barberShopId/:id',
-	authMiddleware,
-	adminMiddleware,
-	serviceController.update,
+  '/:barberShopIdOrSlug/:id',
+  authMiddleware,
+  adminMiddleware,
+  serviceController.update,
 );
 
 serviceRoutes.delete(
-	'/:barberShopId/:id',
-	authMiddleware,
-	adminMiddleware,
-	serviceController.delete,
+  '/:barberShopIdOrSlug/:id',
+  authMiddleware,
+  adminMiddleware,
+  serviceController.delete,
 );

@@ -2,7 +2,7 @@ import { app } from '@shared/infra/http/app';
 import { prisma } from '@shared/infra/prisma/client';
 import request from 'supertest';
 
-describe('[PATCH] /services/:barberShopId/:id', () => {
+describe('createService', () => {
   let superAdminToken: string;
   let adminToken: string;
   let barberShopId: string;
@@ -16,6 +16,7 @@ describe('[PATCH] /services/:barberShopId/:id', () => {
 
     superAdminToken = response.body.token;
 
+    // Create a barber shop and an admin user, then get the admin token
     await request(app)
       .post('/barber-shop')
       .set('Authorization', `Bearer ${superAdminToken}`)
@@ -56,83 +57,61 @@ describe('[PATCH] /services/:barberShopId/:id', () => {
     adminToken = adminLoginResponse.body.token;
   });
 
-  it('should be able to update a service', async () => {
-    await request(app)
+  it('should be able to create a new service', async () => {
+    const response = await request(app)
       .post(`/services/${barberShopId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        name: 'Corte de cabelo',
-        description: 'Corte masculino',
-        price: 50,
+        name: 'Test Service',
+        description: 'Test Description',
+        price: 100,
         durationInMinutes: 30,
       });
 
-    const service = await prisma.service.findFirst({
-      where: { name: 'Corte de cabelo' },
-    });
+    const services = await prisma.service.findMany();
 
-    const response = await request(app)
-      .patch(`/services/${barberShopId}/${service?.id}`)
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({
-        name: 'Corte atualizado',
-        price: 60,
-      });
-
-    const updatedService = await prisma.service.findUnique({
-      where: { id: service?.id },
-    });
-
-    expect(response.status).toBe(204);
-    expect(updatedService?.name).toBe('Corte atualizado');
-    expect(Number(updatedService?.price)).toBe(60);
+    expect(response.status).toBe(201);
+    expect(services.length).toBe(1);
+    expect(services[0].name).toBe('Test Service');
   });
 
-  it('should be able to update a service using barberShop slug', async () => {
-    await request(app)
+  it('should be able to create a new service using barber shop slug', async () => {
+    const response = await request(app)
       .post(`/services/${barberShopSlug}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        name: 'Corte de cabelo',
-        description: 'Corte masculino',
-        price: 50,
+        name: 'Test Service 2',
+        description: 'Test Description 2',
+        price: 150,
+        durationInMinutes: 45,
+      });
+
+    const services = await prisma.service.findMany({
+      where: { name: 'Test Service 2' },
+    });
+
+    expect(response.status).toBe(201);
+    expect(services.length).toBe(1);
+    expect(services[0].name).toBe('Test Service 2');
+  });
+
+  it('should not be able to create a service for a non-existent barber shop', async () => {
+    const response = await request(app)
+      .post(`/services/${crypto.randomUUID()}`)
+      .set('Authorization', `Bearer ${superAdminToken}`)
+      .send({
+        name: 'Test Service',
+        description: 'Test Description',
+        price: 100,
         durationInMinutes: 30,
       });
 
-    const service = await prisma.service.findFirst({
-      where: { name: 'Corte de cabelo' },
-    });
-
-    const response = await request(app)
-      .patch(`/services/${barberShopSlug}/${service?.id}`)
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({
-        name: 'Corte atualizado',
-        price: 60,
-      });
-
-    const updatedService = await prisma.service.findUnique({
-      where: { id: service?.id },
-    });
-
-    expect(response.status).toBe(204);
-    expect(updatedService?.name).toBe('Corte atualizado');
-    expect(Number(updatedService?.price)).toBe(60);
-  });
-
-  it('should not be able to update a non-existent service', async () => {
-    const response = await request(app)
-      .patch(`/services/${barberShopId}/${crypto.randomUUID()}`)
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({
-        name: 'Updated',
-      });
-
     expect(response.status).toBe(404);
-    expect(response.body.message).toBe('Service not found');
+    expect(response.body.message).toBe('Barber shop not found');
   });
 
-  it('should not allow non-admin users to update a service', async () => {
+  it('should not be allowed to create a service if user is not admin', async () => {
+    // Creating a non-admin user
     await request(app).post(`/auth/${barberShopId}/register`).send({
       name: 'Regular User',
       email: 'regular@example.com',
@@ -148,13 +127,14 @@ describe('[PATCH] /services/:barberShopId/:id', () => {
 
     const nonAdminToken = regularLoginResponse.body.token;
 
-    const service = await prisma.service.findFirst();
-
     const response = await request(app)
-      .patch(`/services/${barberShopId}/${service?.id}`)
+      .post(`/services/${barberShopId}`)
       .set('Authorization', `Bearer ${nonAdminToken}`)
       .send({
-        name: 'Should Not Update',
+        name: 'Test Service',
+        description: 'Test Description',
+        price: 100,
+        durationInMinutes: 30,
       });
 
     expect(response.status).toBe(403);

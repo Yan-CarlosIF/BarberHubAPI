@@ -2,10 +2,11 @@ import type { IBarberShopRepository } from '@modules/BarberShop/repositories/IBa
 import { AppError } from '@shared/errors/appError';
 import { isValidUUID } from '@utils/isValidUUID';
 import { inject, injectable } from 'tsyringe';
+import type { ICreateServiceDTO } from '../../dtos/ICreateServiceDTO';
 import type { IServiceRepository } from '../../repositories/IServiceRepository';
 
 @injectable()
-export class ListServicesService {
+export class CreateServiceService {
   constructor(
     @inject('ServiceRepository')
     private serviceRepository: IServiceRepository,
@@ -13,7 +14,13 @@ export class ListServicesService {
     private barberShopRepository: IBarberShopRepository,
   ) {}
 
-  async execute(barberShopId: string) {
+  async execute({
+    barberShopId,
+    durationInMinutes,
+    name,
+    price,
+    description,
+  }: ICreateServiceDTO) {
     const barberShopExists = isValidUUID(barberShopId)
       ? await this.barberShopRepository.findById(barberShopId)
       : await this.barberShopRepository.findBySlug(barberShopId);
@@ -22,10 +29,12 @@ export class ListServicesService {
       throw new AppError('Barber shop not found', 404);
     }
 
-    const services = await this.serviceRepository.findAllByBarberShopId(
-      barberShopExists.id,
-    );
-
-    return services;
+    await this.serviceRepository.create({
+      barberShopId: barberShopExists.id,
+      durationInMinutes,
+      name,
+      price,
+      description,
+    });
   }
 }

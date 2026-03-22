@@ -717,18 +717,18 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    '/services/{barberShopId}': {
+    '/services/{barberShopIdOrSlug}': {
       post: {
         summary: 'Criar Serviço',
         tags: ['Service'],
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
           },
         ],
         requestBody: {
@@ -782,11 +782,11 @@ export const openApiDocument = createDocument({
         tags: ['Service'],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
           },
         ],
         responses: {
@@ -842,18 +842,18 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    '/services/{barberShopId}/{id}': {
+    '/services/{barberShopIdOrSlug}/{id}': {
       patch: {
         summary: 'Atualizar Serviço',
         tags: ['Service'],
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
           },
           {
             name: 'id',
@@ -915,11 +915,11 @@ export const openApiDocument = createDocument({
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
           },
           {
             name: 'id',

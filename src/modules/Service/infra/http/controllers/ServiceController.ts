@@ -1,9 +1,12 @@
 import {
-	createServiceBodySchema,
-	type ICreateServiceBodyDTO,
+  createServiceBodySchema,
+  type ICreateServiceBodyDTO,
 } from '@modules/Service/dtos/ICreateServiceDTO';
-import { updateServiceSchema } from '@modules/Service/dtos/IUpdateServiceDTO';
-import { CreateServiceService } from '@modules/Service/services/createService.service';
+import {
+  type IUpdateServiceDTO,
+  updateServiceSchema,
+} from '@modules/Service/dtos/IUpdateServiceDTO';
+import { CreateServiceService } from '@modules/Service/services/createService/createService.service';
 import { DeleteServiceService } from '@modules/Service/services/deleteService/deleteService.service';
 import { ListServicesService } from '@modules/Service/services/listServices/listServices.service';
 import { UpdateServiceService } from '@modules/Service/services/updateService/updateService.service';
@@ -12,77 +15,106 @@ import { container } from 'tsyringe';
 import { z } from 'zod';
 
 export class ServiceController {
-	async create(
-		request: Request<{ barberShopId: string }, unknown, ICreateServiceBodyDTO>,
-		response: Response,
-	) {
-		const { barberShopId } = z
-			.object({ barberShopId: z.uuid() })
-			.parse(request.params);
+  async create(
+    request: Request<
+      { barberShopIdOrSlug: string },
+      unknown,
+      ICreateServiceBodyDTO
+    >,
+    response: Response,
+  ) {
+    const { barberShopIdOrSlug } = z
+      .object({
+        barberShopIdOrSlug: z
+          .string('BarberShop ID or Slug is invalid')
+          .nonempty('BarberShop ID or Slug is required'),
+      })
+      .parse(request.params);
 
-		const { name, description, price, durationInMinutes } =
-			createServiceBodySchema.parse(request.body);
+    const { name, description, price, durationInMinutes } =
+      createServiceBodySchema.parse(request.body);
 
-		const createServiceService = container.resolve(CreateServiceService);
+    const createServiceService = container.resolve(CreateServiceService);
 
-		await createServiceService.execute({
-			barberShopId,
-			name,
-			description,
-			price,
-			durationInMinutes,
-		});
+    await createServiceService.execute({
+      barberShopId: barberShopIdOrSlug,
+      name,
+      description,
+      price,
+      durationInMinutes,
+    });
 
-		return response.status(201).send();
-	}
+    return response.status(201).send();
+  }
 
-	async list(request: Request<{ barberShopId: string }>, response: Response) {
-		const { barberShopId } = z
-			.object({ barberShopId: z.uuid() })
-			.parse(request.params);
+  async list(
+    request: Request<{ barberShopIdOrSlug: string }>,
+    response: Response,
+  ) {
+    const { barberShopIdOrSlug } = z
+      .object({
+        barberShopIdOrSlug: z
+          .string('BarberShop ID or Slug is invalid')
+          .nonempty('BarberShop ID or Slug is required'),
+      })
+      .parse(request.params);
 
-		const listServicesService = container.resolve(ListServicesService);
+    const listServicesService = container.resolve(ListServicesService);
 
-		const services = await listServicesService.execute(barberShopId);
+    const services = await listServicesService.execute(barberShopIdOrSlug);
 
-		return response.status(200).json(services);
-	}
+    return response.status(200).json(services);
+  }
 
-	async update(
-		request: Request<{ barberShopId: string; id: string }>,
-		response: Response,
-	) {
-		const { id } = z
-			.object({
-				barberShopId: z.uuid(),
-				id: z.uuid(),
-			})
-			.parse(request.params);
+  async update(
+    request: Request<
+      { barberShopIdOrSlug: string; id: string },
+      unknown,
+      IUpdateServiceDTO
+    >,
+    response: Response,
+  ) {
+    const { id } = z
+      .object({
+        barberShopIdOrSlug: z
+          .string('BarberShop ID or Slug is invalid')
+          .nonempty('BarberShop ID or Slug is required'),
+        id: z.uuid(),
+      })
+      .parse(request.params);
 
-		const data = updateServiceSchema.parse(request.body);
+    const { description, durationInMinutes, name, price } =
+      updateServiceSchema.parse(request.body);
 
-		const updateServiceService = container.resolve(UpdateServiceService);
+    const updateServiceService = container.resolve(UpdateServiceService);
 
-		await updateServiceService.execute(id, data);
+    await updateServiceService.execute(id, {
+      description,
+      durationInMinutes,
+      name,
+      price,
+    });
 
-		return response.status(204).send();
-	}
+    return response.status(204).send();
+  }
 
-	async delete(
-		request: Request<{ barberShopId: string; id: string }>,
-		response: Response,
-	) {
-		const { id } = z
-			.object({
-				barberShopId: z.uuid(),
-				id: z.uuid(),
-			})
-			.parse(request.params);
+  async delete(
+    request: Request<{ barberShopIdOrSlug: string; id: string }>,
+    response: Response,
+  ) {
+    const { id } = z
+      .object({
+        barberShopIdOrSlug: z
+          .string('BarberShop ID or Slug is invalid')
+          .nonempty('BarberShop ID or Slug is required'),
+        id: z.uuid(),
+      })
+      .parse(request.params);
 
-		const deleteServiceService = container.resolve(DeleteServiceService);
+    const deleteServiceService = container.resolve(DeleteServiceService);
 
-		await deleteServiceService.execute(id);
+    await deleteServiceService.execute(id);
 
-		return response.status(204).send();
-	}
+    return response.status(204).send();
+  }
 }
