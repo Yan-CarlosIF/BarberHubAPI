@@ -69,17 +69,17 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    '/auth/{barberShopId}/register': {
+    '/auth/{barberShopIdOrSlug}/register': {
       post: {
         summary: 'Registrar Cliente',
         tags: ['User'],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou Slug da barbearia',
           },
         ],
         requestBody: {
@@ -125,17 +125,17 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    '/users/{barberShopId}/admin': {
+    '/users/{barberShopIdOrSlug}/admin': {
       post: {
         summary: 'Registrar Administrador',
         tags: ['User'],
         parameters: [
           {
-            name: 'barberShopId',
+            name: 'barberShopIdOrSlug',
             in: 'path',
             required: true,
-            schema: { type: 'string', format: 'uuid' },
-            description: 'ID da barbearia',
+            schema: { type: 'string' },
+            description: 'ID ou Slug da barbearia',
           },
         ],
         requestBody: {

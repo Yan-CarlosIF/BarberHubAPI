@@ -6,7 +6,7 @@ export const authRoutes = Router();
 const registerClientController = new UserController();
 
 authRoutes.post(
-	'/:barberShopId/register',
-	registerClientController.registerClientHandle,
+  '/:barberShopIdOrSlug/register',
+  registerClientController.registerClientHandle,
 );
 authRoutes.post('/login', registerClientController.loginHandle);
