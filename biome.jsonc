@@ -6,11 +6,12 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": true,
+    "includes": ["**", "!node_modules", "!dist", "!build"]
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab",
+		"indentStyle": "space",
 		"lineWidth": 80
 	},
 	"linter": {
@@ -24,7 +25,7 @@
 				"useExhaustiveDependencies": "off"
 			},
 			"style": {
-				"useImportType": "on"
+				"useImportType": "warn"
 			}
 		}
 	},

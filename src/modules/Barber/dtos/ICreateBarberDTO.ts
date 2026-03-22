@@ -5,7 +5,7 @@ export const createBarberSchema = z
 		name: z.string().min(1, 'Nome é obrigatório'),
 		email: z.email('Email inválido'),
 		password: z.string().min(6, 'Senha deve conter pelo menos 6 caracteres'),
-		barberShopId: z.uuid().nonempty('ID da barbearia é obrigatório'),
+		barberShopId: z.uuid('Barbershop ID is invalid'),
 		isActive: z.boolean().optional().default(true),
 		specialty: z.string().optional(),
 	})

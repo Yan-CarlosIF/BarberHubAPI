@@ -92,11 +92,11 @@ barberRoutes.post(
 );
 
 // List barbers by barber shop
-barberRoutes.get('/:barberShopId', barberController.listBarbersHandle);
+barberRoutes.get('/:barberShopIdOrSlug', barberController.listBarbersHandle);
 
 // Delete a barber
 barberRoutes.delete(
-	'/:barberShopId/:id',
+	'/:barberShopIdOrSlug/:id',
 	authMiddleware,
 	adminMiddleware,
 	barberController.deleteBarberHandle,
@@ -104,7 +104,7 @@ barberRoutes.delete(
 
 // Update a barber
 barberRoutes.patch(
-	'/:barberShopId/:id',
+	'/:barberShopIdOrSlug/:id',
 	authMiddleware,
 	adminMiddleware,
 	barberController.updateBarberHandle,

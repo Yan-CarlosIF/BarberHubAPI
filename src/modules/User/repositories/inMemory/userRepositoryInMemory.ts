@@ -1,6 +1,7 @@
 import type { ICreateBarberDTO } from '@modules/Barber/dtos/ICreateBarberDTO';
 import type { IUpdateBarberDTO } from '@modules/Barber/dtos/IUpdateBarberDTO';
 import { Barber } from '@modules/Barber/infra/prisma/entities/Barber';
+import type { BarberShop } from '@modules/BarberShop/infra/prisma/entities/BarberShop';
 import { $Enums } from '@prisma/client';
 import type { ICreateUserDTO } from '../../dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '../../dtos/IregisterClientDTO';
@@ -82,6 +83,36 @@ export class UserRepositoryInMemory implements IUserRepository {
 		this.users[userIndex] = {
 			...this.users[userIndex],
 			...data,
+		};
+	}
+
+	async getUserBarberShop(userId: string): Promise<BarberShop | null> {
+		const user = this.users.find((user) => user.id === userId);
+
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		const barberShopId = this.barbers.find(
+			(barber) => barber.user.id === userId,
+		)?.barberShopId;
+
+		if (!barberShopId) {
+			throw new Error('Barber shop not found');
+		}
+
+		return {
+			id: barberShopId,
+			name: 'Barber Shop',
+			slug: 'barber-shop',
+			cep: '12345678',
+			city: 'City',
+			state: 'State',
+			street: 'Street',
+			createdAt: new Date(),
+			description: 'Description',
+			email: 'email@email.com',
+			phone: '123456789',
 		};
 	}
 }

@@ -27,6 +27,8 @@ export class LoginService {
 			throw new AppError('Invalid credentials', 401);
 		}
 
+		const barberShop = await this.userRepository.getUserBarberShop(user.id);
+
 		const token = sign(
 			{
 				user: {
@@ -34,7 +36,8 @@ export class LoginService {
 					name: user.name,
 					email: user.email,
 					role: user.role,
-					barberShopId: user.barberShopId,
+					barberShopId: barberShop?.id,
+					barberShopSlug: barberShop?.slug,
 				},
 			},
 			env.JWT_SECRET,

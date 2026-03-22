@@ -6,6 +6,7 @@ declare namespace Express {
 			email: string;
 			role: 'CLIENT' | 'BARBER' | 'ADMIN' | 'SUPER_ADMIN';
 			barberShopId?: string;
+			barberShopSlug?: string;
 		};
 	}
 }

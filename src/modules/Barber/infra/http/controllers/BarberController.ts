@@ -28,7 +28,6 @@ import { ListBarbersService } from '@modules/Barber/services/listBarbers/listBar
 import { SetBarberAvailabilityService } from '@modules/Barber/services/setBarberAvailability/setBarberAvailabilityService';
 import { UnassignBarberServiceService } from '@modules/Barber/services/unassignBarberService/unassignBarberServiceService';
 import { UpdateBarberService } from '@modules/Barber/services/updateBarber/updateBarberService';
-import { AppError } from '@shared/errors/appError';
 import type { Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { z } from 'zod';
@@ -50,7 +49,7 @@ export class BarberController {
 		request: Request<
 			Pick<ICreateBarberDTO, 'barberShopId'>,
 			unknown,
-			Omit<ICreateBarberDTO, 'isActive' | 'barberShopId'>
+			Omit<ICreateBarberDTO, 'isActive' | 'barberShopIdOrSlug'>
 		>,
 		response: Response,
 	) {
@@ -58,10 +57,10 @@ export class BarberController {
 			.omit({ isActive: true, barberShopId: true })
 			.parse(request.body);
 
-		const { barberShopId } = z
+		const { barberShopIdOrSlug } = z
 			.object({
-				barberShopId: z
-					.uuid('Barbershop ID is invalid')
+				barberShopIdOrSlug: z
+					.string('Barbershop ID is invalid')
 					.nonempty('Barbershop ID is required'),
 			})
 			.parse(request.params);
@@ -70,7 +69,7 @@ export class BarberController {
 
 		await createBarberService.execute({
 			name,
-			barberShopId,
+			barberShopId: barberShopIdOrSlug,
 			email,
 			password,
 			isActive: true,
@@ -83,12 +82,14 @@ export class BarberController {
 	}
 
 	async deleteBarberHandle(
-		request: Request<{ barberShopId: string; id: string }>,
+		request: Request<{ barberShopIdOrSlug: string; id: string }>,
 		response: Response,
 	) {
 		const { id } = z
 			.object({
-				barberShopId: z.uuid('Barbershop ID is invalid'),
+				barberShopIdOrSlug: z
+					.string('Barbershop ID is invalid')
+					.nonempty('Barbershop ID is required'),
 				id: z.uuid('Barber ID is invalid'),
 			})
 			.parse(request.params);
@@ -102,7 +103,7 @@ export class BarberController {
 
 	async updateBarberHandle(
 		request: Request<
-			{ barberShopId: string; id: string },
+			{ barberShopIdOrSlug: string; id: string },
 			unknown,
 			IUpdateBarberDTO
 		>,
@@ -110,7 +111,9 @@ export class BarberController {
 	) {
 		const { id } = z
 			.object({
-				barberShopId: z.uuid('Barbershop ID is invalid'),
+				barberShopIdOrSlug: z
+					.string('Barbershop ID or Slug is invalid')
+					.nonempty('Barbershop ID or Slug is required'),
 				id: z.uuid('Barber ID is invalid'),
 			})
 			.parse(request.params);
@@ -126,20 +129,20 @@ export class BarberController {
 	}
 
 	async listBarbersHandle(
-		request: Request<{ barberShopId: string }>,
+		request: Request<{ barberShopIdOrSlug: string }>,
 		response: Response,
 	) {
-		const { barberShopId } = z
-			.object({ barberShopId: z.uuid('Barbershop ID is invalid') })
+		const { barberShopIdOrSlug } = z
+			.object({
+				barberShopIdOrSlug: z
+					.string('Barbershop Id or Slug is invalid')
+					.nonempty('Barbershop Id or Slug is required'),
+			})
 			.parse(request.params);
-
-		if (!barberShopId) {
-			throw new AppError('BarberShopId is required', 400);
-		}
 
 		const listBarbersService = container.resolve(ListBarbersService);
 
-		const barbers = await listBarbersService.execute(barberShopId);
+		const barbers = await listBarbersService.execute(barberShopIdOrSlug);
 
 		return response.status(200).json(barbers);
 	}

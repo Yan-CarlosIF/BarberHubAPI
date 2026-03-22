@@ -1,6 +1,7 @@
 import type { ICreateBarberDTO } from '@modules/Barber/dtos/ICreateBarberDTO';
 import type { IUpdateBarberDTO } from '@modules/Barber/dtos/IUpdateBarberDTO';
 import type { Barber } from '@modules/Barber/infra/prisma/entities/Barber';
+import type { BarberShop } from '@modules/BarberShop/infra/prisma/entities/BarberShop';
 import type { ICreateUserDTO } from '@modules/User/dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
 import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
@@ -106,5 +107,20 @@ export class UserRepositoryPrisma implements IUserRepository {
 				},
 			},
 		});
+	}
+
+	async getUserBarberShop(userId: string): Promise<BarberShop | null> {
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+			include: {
+				barberShop: true,
+			},
+		});
+
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		return user.barberShop;
 	}
 }

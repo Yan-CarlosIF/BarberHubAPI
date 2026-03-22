@@ -4,13 +4,13 @@ import { isValidUUID } from '@utils/isValidUUID';
 import { inject, injectable } from 'tsyringe';
 
 @injectable()
-export class DeleteBarberShopService {
+export class GetBarberShopService {
   constructor(
     @inject('BarberShopRepository')
     private barberShopRepository: IBarberShopRepository,
   ) {}
 
-  async execute(idOrSlug: string): Promise<void> {
+  async execute(idOrSlug: string) {
     const barberShop = isValidUUID(idOrSlug)
       ? await this.barberShopRepository.findById(idOrSlug)
       : await this.barberShopRepository.findBySlug(idOrSlug);
@@ -19,6 +19,6 @@ export class DeleteBarberShopService {
       throw new AppError('Barber shop not found', 404);
     }
 
-    await this.barberShopRepository.delete(barberShop.id);
+    return barberShop;
   }
 }

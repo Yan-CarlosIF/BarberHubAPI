@@ -25,10 +25,16 @@ export function adminMiddleware(
 		);
 	}
 
-	if (
-		req.user.role === 'ADMIN' &&
-		req.user?.barberShopId === req.params?.barberShopId
-	) {
+	const userBarberShopId = req.user?.barberShopId;
+	const userBarberShopSlug = req.user?.barberShopSlug;
+	const paramsBarberShopIdOrSlug = req.params?.barberShopIdOrSlug;
+	const isUserAdmin = req.user.role === 'ADMIN';
+
+	if (isUserAdmin && userBarberShopId === paramsBarberShopIdOrSlug) {
+		return next();
+	}
+
+	if (userBarberShopSlug === paramsBarberShopIdOrSlug) {
 		return next();
 	}
 
