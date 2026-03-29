@@ -8,6 +8,7 @@ import {
   registerClientSchema,
 } from '@modules/User/dtos/IregisterClientDTO';
 import { CreateAdminService } from '@modules/User/services/createAdmin/createAdminService';
+import { ListAdminsService } from '@modules/User/services/listAdmins/listAdminsService';
 import { LoginService } from '@modules/User/services/login/loginService';
 import { RegisterClientService } from '@modules/User/services/registerClient/registerClientService';
 import type { Request, Response } from 'express';
@@ -66,6 +67,25 @@ export class UserController {
     return response
       .status(201)
       .json({ message: 'Client registered successfully' });
+  }
+
+  public async listAdminsHandle(
+    request: Request<{ barberShopIdOrSlug: string }>,
+    response: Response,
+  ) {
+    const { barberShopIdOrSlug } = z
+      .object({
+        barberShopIdOrSlug: z
+          .string('Barbershop ID or Slug is invalid')
+          .nonempty('Barbershop ID or Slug is required'),
+      })
+      .parse(request.params);
+
+    const listAdminsService = container.resolve(ListAdminsService);
+
+    const admins = await listAdminsService.execute(barberShopIdOrSlug);
+
+    return response.json(admins);
   }
 
   public async createAdminHandle(

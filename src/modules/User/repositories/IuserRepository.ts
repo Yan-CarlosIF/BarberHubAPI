@@ -7,13 +7,14 @@ import type { IRegisterClientDTO } from '../dtos/IregisterClientDTO';
 import type { User } from '../infra/prisma/entities/User';
 
 export interface IUserRepository {
-	createClient(data: IRegisterClientDTO): Promise<void>;
-	createBarber(data: ICreateBarberDTO): Promise<void>;
-	createAdmin(data: ICreateUserDTO): Promise<void>;
-	findByEmail(email: string): Promise<User | null>;
-	findById(id: string): Promise<User | null>;
-	getUserBarberShop(userId: string): Promise<BarberShop | null>;
-	listBarbersByBarbershop(barberShopId: string): Promise<Barber[]>;
-	delete(id: string): Promise<void>;
-	updateBarber(data: IUpdateBarberDTO): Promise<void>;
+  createClient(data: IRegisterClientDTO): Promise<void>;
+  createBarber(data: ICreateBarberDTO): Promise<void>;
+  createAdmin(data: ICreateUserDTO): Promise<void>;
+  findByEmail(email: string): Promise<User | null>;
+  findById(id: string): Promise<User | null>;
+  getUserBarberShop(userId: string): Promise<BarberShop | null>;
+  listBarbersByBarbershop(barberShopId: string): Promise<Barber[]>;
+  listAdminsByBarbershop(barberShopId: string): Promise<User[]>;
+  delete(id: string): Promise<void>;
+  updateBarber(data: IUpdateBarberDTO): Promise<void>;
 }

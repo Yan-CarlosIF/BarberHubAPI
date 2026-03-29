@@ -200,6 +200,75 @@ export const openApiDocument = createDocument({
           },
         },
       },
+      get: {
+        summary: 'Listar Administradores',
+        tags: ['User'],
+        parameters: [
+          {
+            name: 'barberShopIdOrSlug',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID ou Slug da barbearia',
+          },
+        ],
+        responses: {
+          200: {
+            description: 'Lista de administradores',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      barberShopId: { type: 'string', format: 'uuid' },
+                      name: { type: 'string' },
+                      email: { type: 'string', format: 'email' },
+                      role: { type: 'string', example: 'ADMIN' },
+                      isActive: { type: 'boolean' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: 'Barbearia não encontrada',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    message: {
+                      type: 'string',
+                      example: 'Barber shop not found',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          403: {
+            description: 'Usuário sem permissão para realizar esta ação',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    message: {
+                      type: 'string',
+                      example:
+                        'User does not have permission to perform this action',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/barbers/{barberShopIdOrSlug}': {
       get: {

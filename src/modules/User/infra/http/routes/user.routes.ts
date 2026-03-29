@@ -13,3 +13,10 @@ userRoutes.post(
   superAdminMiddleware,
   userController.createAdminHandle,
 );
+
+userRoutes.get(
+  '/:barberShopIdOrSlug/admin',
+  authMiddleware,
+  superAdminMiddleware,
+  userController.listAdminsHandle,
+);
