@@ -418,6 +418,79 @@ export const openApiDocument = createDocument({
         },
       },
     },
+    '/barbers/{barberShopIdOrSlug}/pagination': {
+      get: {
+        summary: 'Listar barbeiros com paginação',
+        tags: ['Barber'],
+        parameters: [
+          {
+            name: 'barberShopIdOrSlug',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID ou slug da barbearia',
+          },
+          {
+            name: 'offset',
+            in: 'query',
+            required: false,
+            schema: { type: 'integer', default: 0 },
+            description: 'Número de itens a pular para paginação',
+          },
+          {
+            name: 'limit',
+            in: 'query',
+            required: false,
+            schema: { type: 'integer' },
+            description: 'Número máximo de itens a retornar',
+          },
+        ],
+        responses: {
+          200: {
+            description: 'Lista de barbeiros com paginação',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    barbers: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string', format: 'uuid' },
+                          specialty: { type: 'string?' },
+                        },
+                      },
+                    },
+                    total: { type: 'integer' },
+                    page: { type: 'integer' },
+                    limit: { type: 'integer' },
+                    lastPage: { type: 'integer' },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: 'Barbearia não encontrada',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    message: {
+                      type: 'string',
+                      example: 'Barber shop not found',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     '/barbers/{barberShopIdOrSlug}/{id}': {
       delete: {
         summary: 'Deletar Barbeiro',

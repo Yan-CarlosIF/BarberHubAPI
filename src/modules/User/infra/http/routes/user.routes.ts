@@ -20,3 +20,10 @@ userRoutes.get(
   superAdminMiddleware,
   userController.listAdminsHandle,
 );
+
+userRoutes.delete(
+  '/:barberShopIdOrSlug/admin/:adminId',
+  authMiddleware,
+  superAdminMiddleware,
+  userController.deleteAdminHandle,
+);

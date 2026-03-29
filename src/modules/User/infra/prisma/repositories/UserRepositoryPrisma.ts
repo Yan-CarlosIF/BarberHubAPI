@@ -7,6 +7,7 @@ import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
 import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { $Enums } from '@prisma/client';
 import { prisma } from '@shared/infra/prisma/client';
+import type { IOffsetPaginationReturn } from '@utils/IPagination';
 import type { User } from '../entities/User';
 
 export class UserRepositoryPrisma implements IUserRepository {
@@ -75,6 +76,40 @@ export class UserRepositoryPrisma implements IUserRepository {
         user: true,
       },
     });
+  }
+
+  async listBarbersByBarbershopPagination(
+    barberShopId: string,
+    offset: number | null,
+    limit: number,
+  ): Promise<IOffsetPaginationReturn<Barber>> {
+    console.log('listBarbersByBarbershopPagination called with:', {
+      barberShopId,
+      offset,
+      limit,
+    });
+
+    const [items, total] = await prisma.$transaction([
+      prisma.barber.findMany({
+        where: { barberShopId },
+        include: {
+          user: true,
+        },
+        skip: offset ?? 0,
+        take: limit,
+      }),
+      prisma.barber.count({
+        where: { barberShopId },
+      }),
+    ]);
+
+    return {
+      items,
+      total,
+      lastPage: Math.ceil(total / limit),
+      page: offset !== null ? Math.floor(offset / limit) + 1 : 1,
+      limit,
+    };
   }
 
   async listAdminsByBarbershop(barberShopId: string): Promise<User[]> {

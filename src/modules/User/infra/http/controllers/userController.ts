@@ -8,6 +8,7 @@ import {
   registerClientSchema,
 } from '@modules/User/dtos/IregisterClientDTO';
 import { CreateAdminService } from '@modules/User/services/createAdmin/createAdminService';
+import { DeleteAdminService } from '@modules/User/services/deleteAdmin/deleteAdminService';
 import { ListAdminsService } from '@modules/User/services/listAdmins/listAdminsService';
 import { LoginService } from '@modules/User/services/login/loginService';
 import { RegisterClientService } from '@modules/User/services/registerClient/registerClientService';
@@ -121,5 +122,24 @@ export class UserController {
     return response
       .status(201)
       .json({ message: 'Admin registered successfully' });
+  }
+
+  public async deleteAdminHandle(
+    request: Request<{ adminId: string }>,
+    response: Response,
+  ) {
+    const { adminId } = z
+      .object({
+        adminId: z
+          .string('Admin ID is invalid')
+          .nonempty('Admin ID is required'),
+      })
+      .parse(request.params);
+
+    const deleteAdminService = container.resolve(DeleteAdminService);
+
+    await deleteAdminService.execute(adminId);
+
+    return response.status(204).send();
   }
 }

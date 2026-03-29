@@ -94,6 +94,12 @@ barberRoutes.post(
 // List barbers by barber shop
 barberRoutes.get('/:barberShopIdOrSlug', barberController.listBarbersHandle);
 
+// List barbers with pagination
+barberRoutes.get(
+  '/:barberShopIdOrSlug/pagination',
+  barberController.listBarbersPaginationHandle,
+);
+
 // Delete a barber
 barberRoutes.delete(
   '/:barberShopIdOrSlug/:id',

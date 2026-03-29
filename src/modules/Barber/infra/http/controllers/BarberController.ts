@@ -26,11 +26,18 @@ import { DeleteBarberAvailabilityService } from '@modules/Barber/services/delete
 import { DeleteBarberBlockService } from '@modules/Barber/services/deleteBarberBlock/deleteBarberBlockService';
 import { ListBarberAvailabilityService } from '@modules/Barber/services/listBarberAvailability/listBarberAvailabilityService';
 import { ListBarberBlocksService } from '@modules/Barber/services/listBarberBlocks/listBarberBlocksService';
+import { ListBarberPaginationService } from '@modules/Barber/services/listBarberPagination/listBarberPaginationService';
 import { ListBarberServicesService } from '@modules/Barber/services/listBarberServices/listBarberServicesService';
 import { ListBarbersService } from '@modules/Barber/services/listBarbers/listBarbersService';
 import { SetBarberAvailabilityService } from '@modules/Barber/services/setBarberAvailability/setBarberAvailabilityService';
 import { UnassignBarberServiceService } from '@modules/Barber/services/unassignBarberService/unassignBarberServiceService';
 import { UpdateBarberService } from '@modules/Barber/services/updateBarber/updateBarberService';
+import {
+  type ListBarbersParams,
+  type ListBarbersQuery,
+  listBarbersPaginationParams,
+  listBarbersPaginationQuery,
+} from '@modules/User/dtos/IListBarbersPaginationDTO';
 import type { Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { z } from 'zod';
@@ -156,6 +163,29 @@ export class BarberController {
     const barbers = await listBarbersService.execute(barberShopIdOrSlug);
 
     return response.status(200).json(barbers);
+  }
+
+  async listBarbersPaginationHandle(
+    request: Request<ListBarbersParams, unknown, unknown, ListBarbersQuery>,
+    response: Response,
+  ) {
+    const { barberShopIdOrSlug } = listBarbersPaginationParams.parse(
+      request.params,
+    );
+
+    const { offset, limit } = listBarbersPaginationQuery.parse(request.query);
+
+    const listBarbersPaginationService = container.resolve(
+      ListBarberPaginationService,
+    );
+
+    const paginationData = await listBarbersPaginationService.execute({
+      barberShopIdOrSlug,
+      offset,
+      limit,
+    });
+
+    return response.status(200).json(paginationData);
   }
 
   // ── Availability ──────────────────────────────────────────

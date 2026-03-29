@@ -1,32 +1,42 @@
 import type { IBarberShopRepository } from '@modules/BarberShop/repositories/IBarberShopRepository';
-import { mapUserWithoutPassword } from '@modules/User/mapper/User.mapper';
+import type { IListBarbersPaginationDTO } from '@modules/User/dtos/IListBarbersPaginationDTO';
 import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { AppError } from '@shared/errors/appError';
 import { isValidUUID } from '@utils/isValidUUID';
 import { inject, injectable } from 'tsyringe';
 
 @injectable()
-export class ListAdminsService {
+export class ListBarberPaginationService {
   constructor(
-    @inject('UserRepository')
-    private userRepository: IUserRepository,
     @inject('BarberShopRepository')
     private barberShopRepository: IBarberShopRepository,
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
   ) {}
 
-  async execute(barberShopIdOrSlug: string) {
-    const barberShopExists = isValidUUID(barberShopIdOrSlug)
+  public async execute({
+    barberShopIdOrSlug,
+    offset = 0,
+    limit,
+  }: IListBarbersPaginationDTO) {
+    const barberShop = isValidUUID(barberShopIdOrSlug)
       ? await this.barberShopRepository.findById(barberShopIdOrSlug)
       : await this.barberShopRepository.findBySlug(barberShopIdOrSlug);
 
-    if (!barberShopExists) {
+    if (!barberShop) {
       throw new AppError('Barber shop not found', 404);
     }
 
-    const admins = await this.userRepository.listAdminsByBarbershop(
-      barberShopExists.id,
-    );
+    const { items, ...rest } =
+      await this.userRepository.listBarbersByBarbershopPagination(
+        barberShop.id,
+        offset ?? 0,
+        limit,
+      );
 
-    return admins.map((admin) => mapUserWithoutPassword(admin));
+    return {
+      barbers: items,
+      ...rest,
+    };
   }
 }

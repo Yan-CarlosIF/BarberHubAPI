@@ -3,6 +3,7 @@ import type { IUpdateBarberDTO } from '@modules/Barber/dtos/IUpdateBarberDTO';
 import { Barber } from '@modules/Barber/infra/prisma/entities/Barber';
 import type { BarberShop } from '@modules/BarberShop/infra/prisma/entities/BarberShop';
 import { $Enums } from '@prisma/client';
+import type { IOffsetPaginationReturn } from '@utils/IPagination';
 import type { ICreateUserDTO } from '../../dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '../../dtos/IregisterClientDTO';
 import { Client } from '../../infra/prisma/entities/Client';
@@ -49,6 +50,42 @@ export class UserRepositoryInMemory implements IUserRepository {
     return this.barbers.filter(
       (barber) => barber.barberShopId === barberShopId,
     );
+  }
+
+  async listBarbersByBarbershopPagination(
+    barberShopId: string,
+    offset: number | null,
+    limit: number,
+  ): Promise<IOffsetPaginationReturn<Barber>> {
+    // 1. Filtrar barbeiros
+    const usersBarbers = this.barbers
+      .filter((barber) => barber.barberShopId === barberShopId)
+      .reduce<Array<Barber & { user: User }>>((acc, barber) => {
+        const user = this.users.find((u) => u.id === barber.userId);
+
+        if (user) {
+          acc.push({
+            ...barber,
+            user,
+          });
+        }
+
+        return acc;
+      }, []);
+
+    // 2. Paginar barbeiros
+    const paginatedBarbers = usersBarbers.slice(
+      offset ?? 0,
+      offset !== null ? offset + limit : limit,
+    );
+
+    return {
+      items: paginatedBarbers,
+      page: offset !== null ? Math.floor(offset / limit) + 1 : 1,
+      total: usersBarbers.length,
+      lastPage: offset !== null ? Math.ceil(usersBarbers.length / limit) : 1,
+      limit,
+    };
   }
 
   async listAdminsByBarbershop(barberShopId: string): Promise<User[]> {
