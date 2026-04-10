@@ -18,7 +18,8 @@ export interface IUserRepository {
   listBarbersByBarbershopPagination(
     barberShopId: string,
     limit: number,
-    offset?: number | null,
+    offset: number,
+    search?: string | null,
   ): Promise<IOffsetPaginationReturn<Barber>>;
   listAdminsByBarbershop(barberShopId: string): Promise<User[]>;
   delete(id: string): Promise<void>;

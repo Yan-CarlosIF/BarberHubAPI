@@ -173,7 +173,8 @@ export class BarberController {
       request.params,
     );
 
-    const { offset, limit } = listBarbersPaginationQuery.parse(request.query);
+    const { offset, limit, search } =
+      listBarbersPaginationQuery.parse(request.query);
 
     const listBarbersPaginationService = container.resolve(
       ListBarberPaginationService,
@@ -181,8 +182,9 @@ export class BarberController {
 
     const paginationData = await listBarbersPaginationService.execute({
       barberShopIdOrSlug,
-      offset,
       limit,
+      offset,
+      search,
     });
 
     return response.status(200).json(paginationData);

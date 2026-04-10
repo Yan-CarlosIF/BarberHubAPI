@@ -18,6 +18,7 @@ export class ListBarberPaginationService {
     barberShopIdOrSlug,
     offset = 0,
     limit,
+    search,
   }: IListBarbersPaginationDTO) {
     const barberShop = isValidUUID(barberShopIdOrSlug)
       ? await this.barberShopRepository.findById(barberShopIdOrSlug)
@@ -30,8 +31,9 @@ export class ListBarberPaginationService {
     const { items, ...rest } =
       await this.userRepository.listBarbersByBarbershopPagination(
         barberShop.id,
-        offset ?? 0,
         limit,
+        offset ?? 0,
+        search,
       );
 
     return {

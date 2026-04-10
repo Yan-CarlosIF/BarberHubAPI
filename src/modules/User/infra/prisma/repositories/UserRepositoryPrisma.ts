@@ -80,18 +80,20 @@ export class UserRepositoryPrisma implements IUserRepository {
 
   async listBarbersByBarbershopPagination(
     barberShopId: string,
-    offset: number | null,
     limit: number,
+    offset: number,
+    search?: string | null,
   ): Promise<IOffsetPaginationReturn<Barber>> {
-    console.log('listBarbersByBarbershopPagination called with:', {
-      barberShopId,
-      offset,
-      limit,
-    });
-
     const [items, total] = await prisma.$transaction([
       prisma.barber.findMany({
-        where: { barberShopId },
+        where: {
+          barberShopId,
+          user: {
+            name: search
+              ? { contains: search, mode: 'insensitive' }
+              : undefined,
+          },
+        },
         include: {
           user: true,
         },
@@ -99,7 +101,14 @@ export class UserRepositoryPrisma implements IUserRepository {
         take: limit,
       }),
       prisma.barber.count({
-        where: { barberShopId },
+        where: {
+          barberShopId,
+          user: {
+            name: search
+              ? { contains: search, mode: 'insensitive' }
+              : undefined,
+          },
+        },
       }),
     ]);
 
@@ -107,7 +116,7 @@ export class UserRepositoryPrisma implements IUserRepository {
       items,
       total,
       lastPage: Math.ceil(total / limit),
-      page: offset !== null ? Math.floor(offset / limit) + 1 : 1,
+      page: offset !== null ? Math.floor((offset ?? 0) / limit) + 1 : 1,
       limit,
     };
   }
