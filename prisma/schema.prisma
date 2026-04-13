@@ -28,7 +28,6 @@ model BarberShop {
 
   barberShopOpeningHours BarberShopOpeningHours[]
   users                  User[]
-  clients                Client[]
   barbers                Barber[]
   services               Service[]
   schedules              Schedule[]
@@ -84,15 +83,13 @@ model User {
 }
 
 model Client {
-  id           String   @id @default(uuid())
-  userId       String   @unique @map("user_id")
-  barberShopId String   @map("barber_shop_id")
-  phone        String   @db.VarChar(20)
-  birthDate    DateTime @map("birth_date") @db.Date
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  phone     String   @db.VarChar(20)
+  birthDate DateTime @map("birth_date") @db.Date
 
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
-  schedules  Schedule[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedules Schedule[]
 }
 
 model Barber {

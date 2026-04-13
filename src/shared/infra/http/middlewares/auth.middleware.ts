@@ -10,6 +10,7 @@ interface ITokenPayload {
 		email: string;
 		role: $Enums.Role;
 		barberShopId?: string;
+		barberShopSlug?: string;
 	};
 }
 

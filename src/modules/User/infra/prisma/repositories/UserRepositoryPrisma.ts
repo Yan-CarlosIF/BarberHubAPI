@@ -8,6 +8,7 @@ import type { IUserRepository } from '@modules/User/repositories/IuserRepository
 import { $Enums } from '@prisma/client';
 import { prisma } from '@shared/infra/prisma/client';
 import type { IOffsetPaginationReturn } from '@utils/IPagination';
+import type { Client } from '../entities/Client';
 import type { User } from '../entities/User';
 
 export class UserRepositoryPrisma implements IUserRepository {
@@ -17,14 +18,13 @@ export class UserRepositoryPrisma implements IUserRepository {
         name: data.name,
         email: data.email,
         password: data.password,
-        barberShopId: data.barberShopId,
+        barberShopId: null,
         role: $Enums.Role.CLIENT,
         isActive: true,
         client: {
           create: {
             phone: data.phone,
             birthDate: data.birthDate,
-            barberShopId: data.barberShopId,
           },
         },
       },
@@ -66,6 +66,13 @@ export class UserRepositoryPrisma implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: { email },
+    });
+  }
+
+  async findClientByUserId(userId: string): Promise<Client | null> {
+    return await prisma.client.findUnique({
+      where: { userId },
+      include: { user: true },
     });
   }
 
@@ -162,17 +169,33 @@ export class UserRepositoryPrisma implements IUserRepository {
   }
 
   async getUserBarberShop(userId: string): Promise<BarberShop | null> {
+    // For ADMIN: barberShop is linked directly via User.barberShopId
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
         barberShop: true,
+        barber: {
+          include: {
+            barberShop: true,
+          },
+        },
       },
     });
 
     if (!user) {
-      throw new Error('User not found');
+      return null;
     }
 
-    return user.barberShop;
+    // ADMIN: direct relation
+    if (user.barberShop) {
+      return user.barberShop;
+    }
+
+    // BARBER: via barber table
+    if (user.barber?.barberShop) {
+      return user.barber.barberShop;
+    }
+
+    return null;
   }
 }

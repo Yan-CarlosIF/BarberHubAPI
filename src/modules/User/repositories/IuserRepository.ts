@@ -5,6 +5,7 @@ import type { BarberShop } from '@modules/BarberShop/infra/prisma/entities/Barbe
 import type { IOffsetPaginationReturn } from '@utils/IPagination';
 import type { ICreateUserDTO } from '../dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '../dtos/IregisterClientDTO';
+import type { Client } from '../infra/prisma/entities/Client';
 import type { User } from '../infra/prisma/entities/User';
 
 export interface IUserRepository {
@@ -13,6 +14,7 @@ export interface IUserRepository {
   createAdmin(data: ICreateUserDTO): Promise<void>;
   findByEmail(email: string): Promise<User | null>;
   findById(id: string): Promise<User | null>;
+  findClientByUserId(userId: string): Promise<Client | null>;
   getUserBarberShop(userId: string): Promise<BarberShop | null>;
   listBarbersByBarbershop(barberShopId: string): Promise<Barber[]>;
   listBarbersByBarbershopPagination(

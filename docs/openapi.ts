@@ -69,19 +69,10 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    '/auth/{barberShopIdOrSlug}/register': {
+    '/auth/register': {
       post: {
         summary: 'Registrar Cliente',
         tags: ['User'],
-        parameters: [
-          {
-            name: 'barberShopIdOrSlug',
-            in: 'path',
-            required: true,
-            schema: { type: 'string' },
-            description: 'ID ou Slug da barbearia',
-          },
-        ],
         requestBody: {
           content: {
             'application/json': {

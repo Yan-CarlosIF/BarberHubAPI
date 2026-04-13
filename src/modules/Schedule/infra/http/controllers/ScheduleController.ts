@@ -42,7 +42,7 @@ export class ScheduleController {
 
     await createScheduleService.execute({
       barberShopId: barberShopIdOrSlug,
-      clientId: request.user.id,
+      userId: request.user.id,
       barberId,
       serviceId,
       date,

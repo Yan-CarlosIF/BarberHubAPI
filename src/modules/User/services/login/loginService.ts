@@ -27,7 +27,16 @@ export class LoginService {
 			throw new AppError('Invalid credentials', 401);
 		}
 
-		const barberShop = await this.userRepository.getUserBarberShop(user.id);
+		let barberShopId: string | undefined;
+		let barberShopSlug: string | undefined;
+
+		// ADMIN and BARBER get barberShop info in their token
+		// CLIENT and SUPER_ADMIN are global — no barberShop in token
+		if (user.role === 'ADMIN' || user.role === 'BARBER') {
+			const barberShop = await this.userRepository.getUserBarberShop(user.id);
+			barberShopId = barberShop?.id;
+			barberShopSlug = barberShop?.slug;
+		}
 
 		const token = sign(
 			{
@@ -36,8 +45,8 @@ export class LoginService {
 					name: user.name,
 					email: user.email,
 					role: user.role,
-					barberShopId: barberShop?.id,
-					barberShopSlug: barberShop?.slug,
+					barberShopId,
+					barberShopSlug,
 				},
 			},
 			env.JWT_SECRET,

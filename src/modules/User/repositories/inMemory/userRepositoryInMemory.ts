@@ -16,7 +16,10 @@ export class UserRepositoryInMemory implements IUserRepository {
   public users: User[] = [];
 
   async createClient(data: IRegisterClientDTO): Promise<void> {
-    const client = new Client(data);
+    const client = new Client({
+      barberShopId: null,
+      ...data,
+    });
 
     this.users.push(client.user);
     this.clients.push(client);
@@ -44,6 +47,10 @@ export class UserRepositoryInMemory implements IUserRepository {
 
   async findByEmail(email: string): Promise<User | null> {
     return this.users.find((user) => user.email === email) ?? null;
+  }
+
+  async findClientByUserId(userId: string): Promise<Client | null> {
+    return this.clients.find((client) => client.userId === userId) ?? null;
   }
 
   async listBarbersByBarbershop(barberShopId: string): Promise<Barber[]> {
@@ -137,29 +144,45 @@ export class UserRepositoryInMemory implements IUserRepository {
     const user = this.users.find((user) => user.id === userId);
 
     if (!user) {
-      throw new Error('User not found');
+      return null;
     }
 
-    const barberShopId = this.barbers.find(
-      (barber) => barber.user.id === userId,
-    )?.barberShopId;
-
-    if (!barberShopId) {
-      throw new Error('Barber shop not found');
+    // ADMIN: direct relation via User.barberShopId
+    if (user.barberShopId) {
+      return {
+        id: user.barberShopId,
+        name: 'Barber Shop',
+        slug: 'barber-shop',
+        cep: '12345678',
+        city: 'City',
+        state: 'State',
+        street: 'Street',
+        createdAt: new Date(),
+        description: 'Description',
+        email: 'email@email.com',
+        phone: '123456789',
+      };
     }
 
-    return {
-      id: barberShopId,
-      name: 'Barber Shop',
-      slug: 'barber-shop',
-      cep: '12345678',
-      city: 'City',
-      state: 'State',
-      street: 'Street',
-      createdAt: new Date(),
-      description: 'Description',
-      email: 'email@email.com',
-      phone: '123456789',
-    };
+    // BARBER: via barber table
+    const barber = this.barbers.find((barber) => barber.user.id === userId);
+
+    if (barber?.barberShopId) {
+      return {
+        id: barber.barberShopId,
+        name: 'Barber Shop',
+        slug: 'barber-shop',
+        cep: '12345678',
+        city: 'City',
+        state: 'State',
+        street: 'Street',
+        createdAt: new Date(),
+        description: 'Description',
+        email: 'email@email.com',
+        phone: '123456789',
+      };
+    }
+
+    return null;
   }
 }

@@ -32,32 +32,22 @@ export class UserController {
 
   public async registerClientHandle(
     request: Request<
-      { barberShopIdOrSlug: string },
       unknown,
-      Omit<IRegisterClientDTO, 'barberShopId' | 'isActive'>
+      unknown,
+      Omit<IRegisterClientDTO, 'isActive'>
     >,
     response: Response,
   ) {
     const { name, birthDate, email, password, phone } = registerClientSchema
       .omit({
-        barberShopId: true,
         isActive: true,
       })
       .parse(request.body);
-
-    const { barberShopIdOrSlug } = z
-      .object({
-        barberShopIdOrSlug: z
-          .string('Barbershop ID or Slug is invalid')
-          .nonempty('Barbershop ID or Slug is required'),
-      })
-      .parse(request.params);
 
     const registerClientService = container.resolve(RegisterClientService);
 
     await registerClientService.execute({
       name,
-      barberShopId: barberShopIdOrSlug,
       birthDate,
       email,
       password,

@@ -4,13 +4,14 @@ import type { IBarberShopRepository } from '@modules/BarberShop/repositories/IBa
 import type { ICreateScheduleBodyDTO } from '@modules/Schedule/dtos/ICreateScheduleDTO';
 import type { IScheduleRepository } from '@modules/Schedule/repositories/IScheduleRepository';
 import type { IServiceRepository } from '@modules/Service/repositories/IServiceRepository';
+import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { AppError } from '@shared/errors/appError';
 import { isValidUUID } from '@utils/isValidUUID';
 import { inject, injectable } from 'tsyringe';
 
 interface IRequest extends ICreateScheduleBodyDTO {
   barberShopId: string;
-  clientId: string;
+  userId: string;
 }
 
 const WEEK_DAYS = [
@@ -46,11 +47,13 @@ export class CreateScheduleService {
     private barberBlockRepository: IBarberBlockRepository,
     @inject('BarberShopRepository')
     private barberShopRepository: IBarberShopRepository,
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
   ) {}
 
   async execute({
     barberShopId,
-    clientId,
+    userId,
     barberId,
     serviceId,
     date,
@@ -62,6 +65,13 @@ export class CreateScheduleService {
 
     if (!barberShop) {
       throw new AppError('Barber shop not found', 404);
+    }
+
+    // Resolve User.id → Client.id
+    const client = await this.userRepository.findClientByUserId(userId);
+
+    if (!client) {
+      throw new AppError('Client profile not found', 404);
     }
 
     const service = await this.serviceRepository.findById(serviceId);
@@ -122,7 +132,7 @@ export class CreateScheduleService {
 
     await this.scheduleRepository.create({
       barberShopId: barberShop.id,
-      clientId,
+      clientId: client.id,
       barberId,
       serviceId,
       date,

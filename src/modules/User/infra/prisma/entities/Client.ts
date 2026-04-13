@@ -1,9 +1,8 @@
 import { $Enums, type Client as ClientType } from '@prisma/client';
 import { User } from './User';
 
-export class Client implements ClientType {
+export class Client implements Omit<ClientType, 'barberShopId'> {
 	id: string = crypto.randomUUID();
-	barberShopId: string | null;
 	phone: string;
 	birthDate: Date;
 
@@ -13,22 +12,20 @@ export class Client implements ClientType {
 	constructor({
 		phone,
 		birthDate,
-		barberShopId,
 		email,
 		isActive,
 		name,
 		password,
-	}: Omit<ClientType, 'id' | 'userId'> &
+	}: Omit<ClientType, 'id' | 'userId' | 'barberShopId'> &
 		Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'role'>) {
 		this.user = new User({
 			email,
 			isActive,
 			name,
 			password,
-			barberShopId,
+			barberShopId: null,
 			role: $Enums.Role.CLIENT,
 		});
-		this.barberShopId = barberShopId;
 		this.userId = this.user.id;
 		this.phone = phone;
 		this.birthDate = birthDate;
