@@ -4,6 +4,7 @@ import type { Barber } from '@modules/Barber/infra/prisma/entities/Barber';
 import type { BarberShop } from '@modules/BarberShop/infra/prisma/entities/BarberShop';
 import type { ICreateUserDTO } from '@modules/User/dtos/IcreateUserDTO';
 import type { IRegisterClientDTO } from '@modules/User/dtos/IregisterClientDTO';
+import { mapUsersWithoutPasswordPrisma } from '@modules/User/mapper/User.mapper';
 import type { IUserRepository } from '@modules/User/repositories/IuserRepository';
 import { $Enums } from '@prisma/client';
 import { prisma } from '@shared/infra/prisma/client';
@@ -72,7 +73,7 @@ export class UserRepositoryPrisma implements IUserRepository {
   async findClientByUserId(userId: string): Promise<Client | null> {
     return await prisma.client.findUnique({
       where: { userId },
-      include: { user: true },
+      include: { user: { omit: mapUsersWithoutPasswordPrisma } },
     });
   }
 
@@ -80,7 +81,9 @@ export class UserRepositoryPrisma implements IUserRepository {
     return await prisma.barber.findMany({
       where: { barberShopId },
       include: {
-        user: true,
+        user: {
+          omit: mapUsersWithoutPasswordPrisma,
+        },
       },
     });
   }
@@ -102,7 +105,9 @@ export class UserRepositoryPrisma implements IUserRepository {
           },
         },
         include: {
-          user: true,
+          user: {
+            omit: mapUsersWithoutPasswordPrisma,
+          },
         },
         skip: offset ?? 0,
         take: limit,

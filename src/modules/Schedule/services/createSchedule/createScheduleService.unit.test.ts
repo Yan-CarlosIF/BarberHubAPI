@@ -5,18 +5,22 @@ import { BarberBlockRepositoryInMemory } from '@modules/Barber/repositories/inMe
 import { BarberShopRepositoryInMemory } from '@modules/BarberShop/repositories/inMemory/barberShopRepositoryInMemory';
 import { ScheduleRepositoryInMemory } from '@modules/Schedule/repositories/inMemory/ScheduleRepositoryInMemory';
 import { ServiceRepositoryInMemory } from '@modules/Service/repositories/inMemory/ServiceRepositoryInMemory';
+import { UserRepositoryInMemory } from '@modules/User/repositories/inMemory/userRepositoryInMemory';
 import { Decimal } from '@prisma/client/runtime/client';
 import { AppError } from '@shared/errors/appError';
 import { CreateScheduleService } from './createScheduleService';
 
-// 2026-03-15 is a Sunday, 2026-03-16 is a Monday
 describe('CreateScheduleService', () => {
   let scheduleRepositoryInMemory: ScheduleRepositoryInMemory;
   let serviceRepositoryInMemory: ServiceRepositoryInMemory;
   let barberAvailabilityRepositoryInMemory: BarberAvailabilityRepositoryInMemory;
   let barberBlockRepositoryInMemory: BarberBlockRepositoryInMemory;
   let barberShopRepositoryInMemory: BarberShopRepositoryInMemory;
+  let userRepositoryInMemory: UserRepositoryInMemory;
   let createScheduleService: CreateScheduleService;
+
+  let userId: string;
+  let userId2: string;
 
   beforeEach(async () => {
     scheduleRepositoryInMemory = new ScheduleRepositoryInMemory();
@@ -25,13 +29,37 @@ describe('CreateScheduleService', () => {
       new BarberAvailabilityRepositoryInMemory();
     barberBlockRepositoryInMemory = new BarberBlockRepositoryInMemory();
     barberShopRepositoryInMemory = new BarberShopRepositoryInMemory();
+    userRepositoryInMemory = new UserRepositoryInMemory();
     createScheduleService = new CreateScheduleService(
       scheduleRepositoryInMemory,
       serviceRepositoryInMemory,
       barberAvailabilityRepositoryInMemory,
       barberBlockRepositoryInMemory,
       barberShopRepositoryInMemory,
+      userRepositoryInMemory,
     );
+
+    await userRepositoryInMemory.createClient({
+      name: 'Client User',
+      email: 'client@example.com',
+      password: 'password',
+      phone: '123456789',
+      birthDate: new Date(),
+      isActive: true
+    });
+
+    userId = userRepositoryInMemory.users[0].id;
+
+    await userRepositoryInMemory.createClient({
+      name: 'Client User 2',
+      email: 'client2@example.com',
+      password: 'password',
+      phone: '987654321',
+      birthDate: new Date(),
+      isActive: true
+    });
+
+    userId2 = userRepositoryInMemory.users[1].id;
 
     // Set barber as available on Sunday 08:00-20:00
     await barberAvailabilityRepositoryInMemory.create({
@@ -75,7 +103,7 @@ describe('CreateScheduleService', () => {
 
     await createScheduleService.execute({
       barberShopId: 'barber-shop',
-      clientId: 'clientId',
+      userId,
       barberId: 'barberId',
       serviceId: service.id,
       date: '2026-03-15',
@@ -92,7 +120,7 @@ describe('CreateScheduleService', () => {
     await expect(
       createScheduleService.execute({
         barberShopId: 'barber-shop',
-        clientId: 'clientId',
+        userId,
         barberId: 'barberId',
         serviceId: 'non-existing-service-id',
         date: '2026-03-15',
@@ -116,7 +144,7 @@ describe('CreateScheduleService', () => {
     await expect(
       createScheduleService.execute({
         barberShopId: 'barber-shop',
-        clientId: 'clientId',
+        userId,
         barberId: 'barberId',
         serviceId: 'inactive-service',
         date: '2026-03-15',
@@ -137,7 +165,7 @@ describe('CreateScheduleService', () => {
 
     await createScheduleService.execute({
       barberShopId: 'barber-shop',
-      clientId: 'clientId',
+      userId,
       barberId: 'barberId',
       serviceId: service.id,
       date: '2026-03-15',
@@ -147,7 +175,7 @@ describe('CreateScheduleService', () => {
     await expect(
       createScheduleService.execute({
         barberShopId: 'barber-shop',
-        clientId: 'clientId2',
+        userId: userId2,
         barberId: 'barberId',
         serviceId: service.id,
         date: '2026-03-15',
@@ -159,6 +187,8 @@ describe('CreateScheduleService', () => {
   });
 
   it('should allow scheduling at a non-conflicting time', async () => {
+
+
     await serviceRepositoryInMemory.create({
       barberShopId: 'barber-shop',
       name: 'Corte de cabelo',
@@ -170,7 +200,7 @@ describe('CreateScheduleService', () => {
 
     await createScheduleService.execute({
       barberShopId: 'barber-shop',
-      clientId: 'clientId',
+      userId,
       barberId: 'barberId',
       serviceId: service.id,
       date: '2026-03-15',
@@ -179,7 +209,7 @@ describe('CreateScheduleService', () => {
 
     await createScheduleService.execute({
       barberShopId: 'barber-shop',
-      clientId: 'clientId2',
+      userId: userId2,
       barberId: 'barberId',
       serviceId: service.id,
       date: '2026-03-15',
@@ -203,7 +233,7 @@ describe('CreateScheduleService', () => {
     await expect(
       createScheduleService.execute({
         barberShopId: 'barber-shop',
-        clientId: 'clientId',
+        userId,
         barberId: 'barberId',
         serviceId: service.id,
         date: '2026-03-17',
@@ -226,7 +256,7 @@ describe('CreateScheduleService', () => {
     await expect(
       createScheduleService.execute({
         barberShopId: 'barber-shop',
-        clientId: 'clientId',
+        userId,
         barberId: 'barberId',
         serviceId: service.id,
         date: '2026-03-15',
@@ -257,7 +287,7 @@ describe('CreateScheduleService', () => {
     await expect(
       createScheduleService.execute({
         barberShopId: 'barber-shop',
-        clientId: 'clientId',
+        userId,
         barberId: 'barberId',
         serviceId: service.id,
         date: '2026-03-15',

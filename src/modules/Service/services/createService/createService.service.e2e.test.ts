@@ -112,7 +112,7 @@ describe('createService', () => {
 
   it('should not be allowed to create a service if user is not admin', async () => {
     // Creating a non-admin user
-    await request(app).post(`/auth/${barberShopId}/register`).send({
+    await request(app).post(`/auth/register`).send({
       name: 'Regular User',
       email: 'regular@example.com',
       password: 'regular123',

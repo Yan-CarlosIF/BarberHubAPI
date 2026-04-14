@@ -12,7 +12,7 @@ export class ListAdminsService {
     private userRepository: IUserRepository,
     @inject('BarberShopRepository')
     private barberShopRepository: IBarberShopRepository,
-  ) {}
+  ) { }
 
   async execute(barberShopIdOrSlug: string) {
     const barberShopExists = isValidUUID(barberShopIdOrSlug)

@@ -133,7 +133,7 @@ describe('[PATCH] /services/:barberShopId/:id', () => {
   });
 
   it('should not allow non-admin users to update a service', async () => {
-    await request(app).post(`/auth/${barberShopId}/register`).send({
+    await request(app).post(`/auth/register`).send({
       name: 'Regular User',
       email: 'regular@example.com',
       password: 'regular123',
