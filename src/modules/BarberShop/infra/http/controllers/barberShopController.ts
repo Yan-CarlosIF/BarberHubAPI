@@ -2,10 +2,15 @@ import {
   createBarberShopDTO,
   type ICreateBarberShopDTO,
 } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
+import {
+  type IListBarberShopsPaginationDTO,
+  listBarberShopsPaginationQuery,
+} from '@modules/BarberShop/dtos/IListBarberShopsPaginationDTO';
 import { CreateBarberShopService } from '@modules/BarberShop/services/createBarberShop/createBarberShopService';
 import { DeleteBarberShopService } from '@modules/BarberShop/services/deleteBarberShop/deleteBarberShopService';
 import { GetBarberShopService } from '@modules/BarberShop/services/getBarberShop/getBarberShopService';
 import { ListBarberShopsService } from '@modules/BarberShop/services/listBarberShops/listBarberShopsService';
+import { ListBarberShopsWithPaginationService } from '@modules/BarberShop/services/listBarberShopsWithPagination/listBarberShopsWithPaginationService';
 import type { Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { z } from 'zod';
@@ -60,7 +65,28 @@ export class BarberShopController {
     response.status(200).json(barberShops);
   }
 
-  async get(
+  public async listWithPagination(
+    request: Request<unknown, unknown, unknown, IListBarberShopsPaginationDTO>,
+    response: Response,
+  ): Promise<void> {
+    const { limit, offset, search } = listBarberShopsPaginationQuery.parse(
+      request.query,
+    );
+
+    const listBarberShopsWithPaginationService = container.resolve(
+      ListBarberShopsWithPaginationService,
+    );
+
+    const barberShops = await listBarberShopsWithPaginationService.execute({
+      limit,
+      offset,
+      search,
+    });
+
+    response.status(200).json(barberShops);
+  }
+
+  public async get(
     request: Request<{ idOrSlug: string }>,
     response: Response,
   ): Promise<void> {

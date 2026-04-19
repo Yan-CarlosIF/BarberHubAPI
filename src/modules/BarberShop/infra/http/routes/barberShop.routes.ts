@@ -25,4 +25,8 @@ barberShopRoutes.get(
   superAdminMiddleware,
   barberShopController.list,
 );
+barberShopRoutes.get(
+  '/with-pagination',
+  barberShopController.listWithPagination,
+);
 barberShopRoutes.get('/:idOrSlug', barberShopController.get);

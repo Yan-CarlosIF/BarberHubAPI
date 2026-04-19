@@ -2,7 +2,7 @@ import { app } from '@shared/infra/http/app';
 import { prisma } from '@shared/infra/prisma/client';
 import request from 'supertest';
 
-describe('[DELETE] /barber-shop/:barberShopIdOrSlug', () => {
+describe('[GET] /barber-shop/:barberShopIdOrSlug', () => {
   let superAdminToken: string;
   let barberShopId: string;
   let barberShopSlug: string;

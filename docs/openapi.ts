@@ -744,6 +744,48 @@ export const openApiDocument = createDocument({
         },
       },
     },
+    '/barber-shop/with-pagination': {
+      get: {
+        summary: 'Listar Barbearias com Paginação',
+        tags: ['BarberShop'],
+        parameters: [
+          {
+            name: 'offset',
+            in: 'query',
+            required: false,
+            schema: { type: 'integer', minimum: 0 },
+            description:
+              'Número de itens a serem pulados antes de começar a coletar os resultados',
+          },
+          {
+            name: 'limit',
+            in: 'query',
+            required: false,
+            schema: { type: 'integer', minimum: 1 },
+            description: 'Número máximo de itens a serem retornados',
+          },
+        ],
+        responses: {
+          200: {
+            description: 'Lista de barbearias com paginação',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    items: {},
+                    total: 'integer',
+                    page: 'integer',
+                    limit: 'integer',
+                    lastPage: 'integer',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     '/barber-shop/{idOrSlug}': {
       delete: {
         summary: 'Deletar Barbearia',
