@@ -1,7 +1,7 @@
 import { app } from '@shared/infra/http/app';
 import request from 'supertest';
 
-describe('List Barber Shops with Pagination', () => {
+describe('[GET] /barber-shop/with-pagination', () => {
   let superAdminToken: string;
 
   beforeAll(async () => {
@@ -21,18 +21,20 @@ describe('List Barber Shops with Pagination', () => {
           slug: `test-barber-shop-${i}`,
           description: 'test description',
           email: `test${i}@example.com`,
-          phone: `(11) 11111-111${i}`,
+          phone: `(11) 11111-11${i >= 10 ? `1${i - 10}` : `0${i}`}`,
           city: `Test City ${i}`,
           street: `Test Street ${i}`,
           state: `Test State ${i}`,
-          cep: `12345-678${i}`,
+          cep: `12345-671`,
+          latitude: -23.55052,
+          longitude: -46.633308,
         });
     }
   });
 
   it('should be able to list the barber shops with pagination', async () => {
     const response = await request(app)
-      .get('/barber-shop?limit=5&offset=0')
+      .get('/barber-shop/with-pagination?limit=5&offset=0')
       .set('Authorization', `Bearer ${superAdminToken}`);
 
     expect(response.status).toBe(200);
@@ -44,7 +46,9 @@ describe('List Barber Shops with Pagination', () => {
 
   it('should be able to list the barber shops with pagination and search', async () => {
     const response = await request(app)
-      .get('/barber-shop?limit=5&offset=0&search=Test Barber Shop 1')
+      .get(
+        '/barber-shop/with-pagination?limit=5&offset=0&search=Test Barber Shop 1',
+      )
       .set('Authorization', `Bearer ${superAdminToken}`);
 
     expect(response.status).toBe(200);
@@ -58,7 +62,9 @@ describe('List Barber Shops with Pagination', () => {
   });
 
   it('should be able to list the barber shops without authentication', async () => {
-    const response = await request(app).get('/barber-shop?limit=5&offset=0');
+    const response = await request(app).get(
+      '/barber-shop/with-pagination?limit=5&offset=0',
+    );
 
     expect(response.status).toBe(200);
     expect(response.body.total).toBe(20);

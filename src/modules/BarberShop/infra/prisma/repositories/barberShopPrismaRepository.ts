@@ -1,32 +1,21 @@
 import type { ICreateBarberShopDTO } from '@modules/BarberShop/dtos/IcreateBarberShopDTO';
 import type { IBarberShopRepository } from '@modules/BarberShop/repositories/IBarberShopRepository';
+import { Decimal } from '@prisma/client/runtime/client';
 import { prisma } from '@shared/infra/prisma/client';
 import type { IOffsetPaginationReturn } from '@utils/IPagination';
 import type { BarberShop } from '../entities/BarberShop';
 
 export class BarberShopPrismaRepository implements IBarberShopRepository {
   async create({
-    slug,
-    cep,
-    city,
-    description,
-    email,
-    name,
-    phone,
-    state,
-    street,
+    latitude,
+    longitude,
+    ...data
   }: ICreateBarberShopDTO): Promise<void> {
     await prisma.barberShop.create({
       data: {
-        slug,
-        cep,
-        city,
-        description,
-        email,
-        name,
-        phone,
-        state,
-        street,
+        ...data,
+        latitude: new Decimal(latitude),
+        longitude: new Decimal(longitude),
       },
     });
   }
@@ -89,10 +78,15 @@ export class BarberShopPrismaRepository implements IBarberShopRepository {
     }
 
     const [total, data] = await prisma.$transaction([
-      prisma.barberShop.count(),
+      prisma.barberShop.count({
+        where,
+      }),
       prisma.barberShop.findMany({
         skip: offset,
         take: limit,
+        orderBy: {
+          createdAt: 'asc',
+        },
         where,
       }),
     ]);

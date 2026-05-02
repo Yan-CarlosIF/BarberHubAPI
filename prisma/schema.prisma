@@ -19,10 +19,14 @@ model BarberShop {
   description String @db.Text
   phone       String @unique @db.VarChar(20)
   email       String @unique @db.VarChar(255)
-  city        String @db.VarChar(100)
-  street      String @db.VarChar(100)
-  state       String @db.VarChar(100)
-  cep         String @db.VarChar(20)
+
+  city   String @db.VarChar(100)
+  street String @db.VarChar(100)
+  state  String @db.VarChar(100)
+  cep    String @db.VarChar(20)
+
+  latitude  Decimal @db.Decimal(9, 6)
+  longitude Decimal @db.Decimal(9, 6)
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
@@ -31,6 +35,48 @@ model BarberShop {
   barbers                Barber[]
   services               Service[]
   schedules              Schedule[]
+  ratings                Rating[]
+  barberShopImages       BarberShopImage[]
+
+  @@index([latitude, longitude])
+}
+
+model BarberShopImage {
+  id           String              @id @default(uuid())
+  barberShopId String              @map("barber_shop_id")
+  url          String              @db.Text
+  key          String              @db.VarChar(255)
+  fileName     String?             @map("file_name") @db.VarChar(255)
+  mimeType     String?             @map("mime_type") @db.VarChar(100)
+  sizeInBytes  Int?                @map("size_in_bytes")
+  type         BarberShopImageType @default(GALLERY)
+  isPrimary    Boolean             @default(false) @map("is_primary")
+  createdAt    DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  barberShop BarberShop @relation(fields: [barberShopId], references: [id], onDelete: Cascade)
+
+  @@index([barberShopId])
+  @@index([barberShopId, type])
+}
+
+enum BarberShopImageType {
+  LOGO
+  COVER
+  GALLERY
+}
+
+model Rating {
+  id           String   @id @default(uuid())
+  barberShopId String   @map("barber_shop_id")
+  clientId     String   @map("client_id")
+  rating       Int
+  comment      String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  barberShop BarberShop @relation(fields: [barberShopId], references: [id], onDelete: Cascade)
+  client     Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([barberShopId, clientId])
 }
 
 enum WeekDay {
@@ -79,7 +125,7 @@ model User {
   barber Barber?
 
   barberShopId String?     @map("barber_shop_id")
-  barberShop   BarberShop? @relation(fields: [barberShopId], references: [id])
+  barberShop   BarberShop? @relation(fields: [barberShopId], references: [id], onDelete: Cascade)
 }
 
 model Client {
@@ -90,6 +136,7 @@ model Client {
 
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   schedules Schedule[]
+  ratings   Rating[]
 }
 
 model Barber {
@@ -99,7 +146,7 @@ model Barber {
   specialty    String? @db.VarChar(100)
 
   user                 User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barberShop           BarberShop           @relation(fields: [barberShopId], references: [id])
+  barberShop           BarberShop           @relation(fields: [barberShopId], references: [id], onDelete: Cascade)
   barberServices       BarberService[]
   schedules            Schedule[]
   barberAvailabilities BarberAvailability[]
@@ -172,8 +219,8 @@ model Schedule {
   createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  client     Client     @relation(fields: [clientId], references: [id])
-  barber     Barber     @relation(fields: [barberId], references: [id])
-  service    Service    @relation(fields: [serviceId], references: [id])
-  barberShop BarberShop @relation(fields: [barberShopId], references: [id])
+  client     Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  barber     Barber     @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  service    Service    @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  barberShop BarberShop @relation(fields: [barberShopId], references: [id], onDelete: Cascade)
 }

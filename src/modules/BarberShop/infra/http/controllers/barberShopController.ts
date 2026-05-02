@@ -20,39 +20,26 @@ export class BarberShopController {
     request: Request<unknown, unknown, ICreateBarberShopDTO>,
     response: Response,
   ): Promise<void> {
-    const { name, slug, description, email, phone, city, street, state, cep } =
-      createBarberShopDTO.parse(request.body);
+    const data = createBarberShopDTO.parse(request.body);
 
     const createBarberShopService = container.resolve(CreateBarberShopService);
 
-    await createBarberShopService.execute({
-      name,
-      slug,
-      description,
-      email,
-      phone,
-      city,
-      street,
-      state,
-      cep,
-    });
+    await createBarberShopService.execute(data);
 
     response.status(201).json({ message: 'Barber shop created successfully' });
   }
 
   public async delete(
-    request: Request<{ idOrSlug: string }>,
+    request: Request<{ id: string }>,
     response: Response,
   ): Promise<void> {
-    const { idOrSlug } = z
-      .object({
-        idOrSlug: z.uuid(),
-      })
+    const { id } = z
+      .object({ id: z.string().nonempty('id is required') })
       .parse(request.params);
 
     const deleteBarberShopService = container.resolve(DeleteBarberShopService);
 
-    await deleteBarberShopService.execute(idOrSlug);
+    await deleteBarberShopService.execute(id);
 
     response.status(204).json();
   }

@@ -30,6 +30,8 @@ describe('[DELETE] /barbers/:barberShopIdOrSlug/:id', () => {
         street: 'Test Street',
         state: 'Test State',
         cep: '12345-678',
+        latitude: -23.55052,
+        longitude: -46.633308,
       });
 
     const barberShop = await prisma.barberShop.findUnique({
