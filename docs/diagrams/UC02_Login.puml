@@ -1,0 +1,91 @@
+@startuml UC02_Login
+!theme plain
+
+title DS02 — Login e Autenticação (RF02, RF03)
+footer BarberHub — Diagrama de Sequência
+
+actor "Usuário" as User
+participant "POST /auth/login" as Route
+control "UserController\n(loginHandle)" as Controller
+control "LoginService" as Service
+entity "UserRepository" as Repo
+database "PostgreSQL" as DB
+
+autonumber
+
+User -> Route : POST /auth/login\n{email, password}
+activate Route
+
+Route -> Controller : loginHandle(req, res)
+activate Controller
+
+Controller -> Controller : Zod parse(req.body)\nnote right: Validação com LoginSchema
+
+alt #FFCCCC Dados inválidos (ZodError)
+    Controller --> User : 400 {message: "Erro de validação"}
+else #CCFFCC Dados válidos
+    Controller -> Service : execute({email, password})
+    activate Service
+
+    == Verificação de Credenciais ==
+
+    Service -> Repo : findByEmail(email)
+    activate Repo
+    Repo -> DB : SELECT * FROM "User"\nWHERE email = ?
+    activate DB
+    DB --> Repo : User | null
+    deactivate DB
+    Repo --> Service : User | null
+    deactivate Repo
+
+    alt #FFCCCC Usuário não encontrado
+        Service --> Controller : throw AppError(\n"Invalid credentials", 401)
+        Controller --> User : 401 {message:\n"Invalid credentials"}
+    else #CCFFCC Usuário encontrado
+        Service -> Service : bcrypt.compare(\npassword, user.password)
+
+        alt #FFCCCC Senha incorreta
+            Service --> Controller : throw AppError(\n"Invalid credentials", 401)
+            Controller --> User : 401 {message:\n"Invalid credentials"}
+        else #CCFFCC Senha correta
+
+            == Resolução de Contexto por Role ==
+
+            alt Role = ADMIN ou BARBER
+                Service -> Repo : getUserBarberShop(user.id)
+                activate Repo
+                Repo -> DB : SELECT bs.* FROM "BarberShop" bs\nJOIN "User" u ON u.barber_shop_id = bs.id\nWHERE u.id = ?
+                activate DB
+                DB --> Repo : BarberShop {id, slug}
+                deactivate DB
+                Repo --> Service : BarberShop {id, slug}
+                deactivate Repo
+                note right of Service
+                    barberShopId e barberShopSlug
+                    incluídos no payload do token
+                end note
+            else Role = CLIENT ou SUPER_ADMIN
+                note right of Service
+                    Usuários globais:
+                    barberShopId = undefined
+                    barberShopSlug = undefined
+                end note
+            end
+
+            == Geração do Token JWT ==
+
+            Service -> Service : jwt.sign({\n  user: {id, name, email,\n  role, barberShopId,\n  barberShopSlug}\n}, JWT_SECRET, JWT_OPTIONS)
+            note right: Token assinado com\nJWT_SECRET (RNF13)
+
+            Service --> Controller : token (string)
+            deactivate Service
+
+            Controller --> User : 200 {token: "eyJhbG..."}
+            deactivate Controller
+        end
+    end
+end
+
+deactivate Route
+
+@enduml

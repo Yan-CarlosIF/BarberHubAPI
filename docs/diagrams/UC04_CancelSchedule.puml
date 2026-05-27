@@ -1,0 +1,96 @@
+@startuml UC04_CancelSchedule
+!theme plain
+
+title DS04 — Cancelar Agendamento (RF15)
+footer BarberHub — Diagrama de Sequência
+
+actor "Cliente" as Client
+participant "PATCH /schedules\n/:barberShopIdOrSlug\n/:id/cancel" as Route
+control "authMiddleware" as Auth
+control "ScheduleController\n(cancel)" as Controller
+control "CancelScheduleService" as Service
+entity "ScheduleRepository" as Repo
+database "PostgreSQL" as DB
+
+autonumber
+
+Client -> Route : PATCH /schedules/:barberShopIdOrSlug/:id/cancel\nHeaders: Authorization: Bearer <token>
+activate Route
+
+== Autenticação ==
+
+Route -> Auth : authMiddleware(req, res, next)
+activate Auth
+Auth -> Auth : jwt.verify(token, JWT_SECRET)
+alt #FFCCCC Token inválido
+    Auth --> Client : 401 {message:\n"Usuário não autorizado"}
+else #CCFFCC Token válido
+    Auth -> Auth : req.user = decoded.user
+    Auth --> Route : next()
+    deactivate Auth
+
+    Route -> Controller : cancel(req, res)
+    activate Controller
+
+    Controller -> Controller : Zod parse(req.params)\n{barberShopIdOrSlug, id}
+
+    alt #FFCCCC Parâmetros inválidos (ZodError)
+        Controller --> Client : 400 {message: "Erro de validação"}
+    else #CCFFCC Parâmetros válidos
+        Controller -> Service : execute(id)
+        activate Service
+
+        == Buscar Agendamento ==
+
+        Service -> Repo : findById(id)
+        activate Repo
+        Repo -> DB : SELECT * FROM "Schedule"\nWHERE id = ?
+        activate DB
+        DB --> Repo : Schedule | null
+        deactivate DB
+        Repo --> Service : Schedule | null
+        deactivate Repo
+
+        alt #FFCCCC Agendamento não encontrado
+            Service --> Controller : throw AppError(\n"Schedule not found", 404)
+            Controller --> Client : 404 {message:\n"Schedule not found"}
+
+        else #FFCCCC Já cancelado
+            note over Service
+                schedule.status === 'CANCELED'
+            end note
+            Service --> Controller : throw AppError(\n"Schedule is already canceled", 400)
+            Controller --> Client : 400 {message:\n"Schedule is already canceled"}
+
+        else #FFCCCC Já concluído
+            note over Service
+                schedule.status === 'COMPLETED'
+            end note
+            Service --> Controller : throw AppError(\n"Cannot cancel a completed schedule", 400)
+            Controller --> Client : 400 {message:\n"Cannot cancel a completed schedule"}
+
+        else #CCFFCC Status permite cancelamento (SCHEDULED / NO_SHOW)
+
+            == Atualizar Status ==
+
+            Service -> Repo : updateStatus({id, status: 'CANCELED'})
+            activate Repo
+            Repo -> DB : UPDATE "Schedule"\nSET status = 'CANCELED',\nupdated_at = NOW()\nWHERE id = ?
+            activate DB
+            DB --> Repo : OK
+            deactivate DB
+            Repo --> Service : void
+            deactivate Repo
+
+            Service --> Controller : void
+            deactivate Service
+
+            Controller --> Client : 204 No Content
+            deactivate Controller
+        end
+    end
+end
+
+deactivate Route
+
+@enduml

@@ -1,0 +1,159 @@
+@startuml UC03_CreateSchedule
+!theme plain
+
+title DS03 — Criar Agendamento (RF13, RF14)
+footer BarberHub — Diagrama de Sequência
+
+actor "Cliente" as Client
+participant "POST /schedules\n/:barberShopIdOrSlug" as Route
+control "authMiddleware" as Auth
+control "ScheduleController\n(create)" as Controller
+control "CreateScheduleService" as Service
+entity "BarberShopRepository" as BSRepo
+entity "UserRepository" as UserRepo
+entity "ServiceRepository" as SvcRepo
+entity "BarberAvailability\nRepository" as AvailRepo
+entity "BarberBlockRepository" as BlockRepo
+entity "ScheduleRepository" as SchedRepo
+database "PostgreSQL" as DB
+
+autonumber
+
+Client -> Route : POST /schedules/:barberShopIdOrSlug\nHeaders: Authorization: Bearer <token>\nBody: {barberId, serviceId, date, startTime}
+activate Route
+
+== Autenticação ==
+
+Route -> Auth : authMiddleware(req, res, next)
+activate Auth
+Auth -> Auth : Extrair token do header\nAuthorization: Bearer <token>
+Auth -> Auth : jwt.verify(token, JWT_SECRET)
+
+alt #FFCCCC Token ausente ou inválido
+    Auth --> Client : 401 {message:\n"Usuário não autorizado"}
+else #CCFFCC Token válido
+    Auth -> Auth : req.user = decoded.user
+    Auth --> Route : next()
+    deactivate Auth
+
+    Route -> Controller : create(req, res)
+    activate Controller
+
+    Controller -> Controller : Zod parse(req.params)\nZod parse(req.body)
+
+    Controller -> Service : execute({barberShopId,\nuserId: req.user.id,\nbarberId, serviceId,\ndate, startTime})
+    activate Service
+
+    == 1. Validar Barbearia ==
+
+    Service -> BSRepo : findById(barberShopId)\nou findBySlug(barberShopId)
+    activate BSRepo
+    BSRepo -> DB : SELECT * FROM "BarberShop" WHERE ...
+    DB --> BSRepo : BarberShop | null
+    BSRepo --> Service : BarberShop | null
+    deactivate BSRepo
+
+    alt #FFCCCC Barbearia não encontrada
+        Service --> Client : 404 {message:\n"Barber shop not found"}
+    end
+
+    == 2. Resolver User → Client ==
+
+    Service -> UserRepo : findClientByUserId(userId)
+    activate UserRepo
+    UserRepo -> DB : SELECT * FROM "Client"\nWHERE user_id = ?
+    DB --> UserRepo : Client | null
+    UserRepo --> Service : Client | null
+    deactivate UserRepo
+
+    alt #FFCCCC Perfil de cliente não encontrado
+        Service --> Client : 404 {message:\n"Client profile not found"}
+    end
+
+    == 3. Validar Serviço ==
+
+    Service -> SvcRepo : findById(serviceId)
+    activate SvcRepo
+    SvcRepo -> DB : SELECT * FROM "Service" WHERE id = ?
+    DB --> SvcRepo : Service | null
+    SvcRepo --> Service : Service | null
+    deactivate SvcRepo
+
+    alt #FFCCCC Serviço não encontrado
+        Service --> Client : 404 {message:\n"Service not found"}
+    else #FFCCCC Serviço inativo
+        Service --> Client : 400 {message:\n"Service is not active"}
+    end
+
+    Service -> Service : endTime = addMinutesToTime(\nstartTime, service.durationInMinutes)
+    note right: Calcula horário de\ntérmino automaticamente
+
+    == 4. Validar Disponibilidade do Barbeiro ==
+
+    Service -> Service : dayOfWeek = WEEK_DAYS[\nnew Date(date).getUTCDay()]
+
+    Service -> AvailRepo : findByBarberIdAndWeekDay(\nbarberId, dayOfWeek)
+    activate AvailRepo
+    AvailRepo -> DB : SELECT * FROM "BarberAvailability"\nWHERE barber_id = ? AND week_day = ?
+    DB --> AvailRepo : BarberAvailability | null
+    AvailRepo --> Service : BarberAvailability | null
+    deactivate AvailRepo
+
+    alt #FFCCCC Barbeiro indisponível neste dia
+        Service --> Client : 400 {message:\n"Barber is not available on this day"}
+    else #FFCCCC Horário fora do expediente
+        Service --> Client : 400 {message:\n"Schedule is outside barber working hours"}
+    end
+
+    == 5. Verificar Bloqueios de Horário ==
+
+    Service -> BlockRepo : findByBarberIdAndDateRange(\nbarberId, date, startTime, endTime)
+    activate BlockRepo
+    BlockRepo -> DB : SELECT * FROM "BarberBlock"\nWHERE barber_id = ? AND date = ?\nAND startTime < endTime\nAND endTime > startTime
+    DB --> BlockRepo : BarberBlock | null
+    BlockRepo --> Service : BarberBlock | null
+    deactivate BlockRepo
+
+    alt #FFCCCC Horário bloqueado pelo barbeiro
+        Service --> Client : 409 {message:\n"Barber has blocked this time slot"}
+    end
+
+    == 6. Verificar Conflitos de Agenda ==
+
+    Service -> SchedRepo : findByBarberAndDateRange(\nbarberId, date, startTime, endTime)
+    activate SchedRepo
+    SchedRepo -> DB : SELECT * FROM "Schedule"\nWHERE barber_id = ? AND date = ?\nAND start_time < ? AND end_time > ?
+    DB --> SchedRepo : Schedule | null
+    SchedRepo --> Service : Schedule | null
+    deactivate SchedRepo
+
+    alt #FFCCCC Conflito de horário
+        Service --> Client : 409 {message:\n"This time slot is already booked\nfor this barber"}
+    else #CCFFCC Horário livre
+
+        == 7. Criar Agendamento ==
+
+        Service -> SchedRepo : create({barberShopId,\nclientId: client.id,\nbarberId, serviceId,\ndate, startTime, endTime})
+        activate SchedRepo
+        SchedRepo -> DB : INSERT INTO "Schedule" (...)
+        note right of DB
+            status = SCHEDULED (padrão)
+            Campos: barberShopId, clientId,
+            barberId, serviceId, date,
+            startTime, endTime
+        end note
+        DB --> SchedRepo : OK
+        SchedRepo --> Service : void
+        deactivate SchedRepo
+
+        Service --> Controller : void
+        deactivate Service
+
+        Controller --> Client : 201 {message:\n"Schedule created successfully"}
+        deactivate Controller
+    end
+end
+
+deactivate Route
+
+@enduml

@@ -1,0 +1,165 @@
+@startuml UC05_CreateBarberAndSetAvailability
+!theme plain
+
+title DS05 — Cadastrar Barbeiro e Configurar Disponibilidade (RF06, RF10)
+footer BarberHub — Diagrama de Sequência
+
+actor "Administrador" as Admin
+participant "API Express" as API
+control "authMiddleware" as Auth
+control "adminMiddleware" as AdminMW
+control "BarberController" as BController
+control "CreateBarberService" as CreateSvc
+control "SetBarberAvailability\nService" as AvailSvc
+entity "BarberShopRepository" as BSRepo
+entity "UserRepository" as UserRepo
+entity "BarberAvailability\nRepository" as AvailRepo
+database "PostgreSQL" as DB
+
+autonumber
+
+== Parte 1: Cadastrar Barbeiro ==
+
+Admin -> API : POST /barbers/:barberShopIdOrSlug\nHeaders: Authorization: Bearer <token>\nBody: {name, email, password, specialty}
+activate API
+
+API -> Auth : authMiddleware(req, res, next)
+activate Auth
+Auth -> Auth : jwt.verify(token, JWT_SECRET)
+Auth -> Auth : req.user = decoded.user\n(role: ADMIN, barberShopId: "xxx")
+Auth --> API : next()
+deactivate Auth
+
+API -> AdminMW : adminMiddleware(req, res, next)
+activate AdminMW
+note over AdminMW
+    Verifica se:
+    1. role === SUPER_ADMIN (acesso total) OU
+    2. role === ADMIN E
+       (barberShopId === params.barberShopIdOrSlug
+       OU barberShopSlug === params.barberShopIdOrSlug)
+end note
+alt #FFCCCC Sem permissão
+    AdminMW --> Admin : 403 {message: "User does not\nhave permission to\nperform this action"}
+else #CCFFCC Permissão concedida
+    AdminMW --> API : next()
+    deactivate AdminMW
+
+    API -> BController : create(req, res)
+    activate BController
+
+    BController -> CreateSvc : execute({barberShopId,\nname, email, password, specialty})
+    activate CreateSvc
+
+    CreateSvc -> BSRepo : findById(barberShopId)\nou findBySlug(barberShopId)
+    activate BSRepo
+    BSRepo -> DB : SELECT * FROM "BarberShop" WHERE ...
+    DB --> BSRepo : BarberShop | null
+    BSRepo --> CreateSvc : BarberShop | null
+    deactivate BSRepo
+
+    alt #FFCCCC Barbearia não encontrada
+        CreateSvc --> Admin : 404 {message:\n"BarberShop not found"}
+    end
+
+    CreateSvc -> UserRepo : findByEmail(email)
+    activate UserRepo
+    UserRepo -> DB : SELECT * FROM "User"\nWHERE email = ?
+    DB --> UserRepo : User | null
+    UserRepo --> CreateSvc : User | null
+    deactivate UserRepo
+
+    alt #FFCCCC E-mail já registrado
+        CreateSvc --> Admin : 400 {message:\n"Email already registered"}
+    else #CCFFCC E-mail disponível
+
+        CreateSvc -> CreateSvc : bcrypt.hash(password, 10)
+
+        CreateSvc -> UserRepo : createBarber({...data,\npassword: hashedPassword,\nbarberShopId: barberShop.id})
+        activate UserRepo
+        UserRepo -> DB : INSERT INTO "User"\n(role = 'BARBER', barber_shop_id = ?)\nINSERT INTO "Barber"\n(user_id = ?, barber_shop_id = ?,\nspecialty = ?)
+        activate DB
+        note right of DB
+            Criação atômica:
+            1. User (role = BARBER)
+            2. Barber (vinculado à barbearia)
+        end note
+        DB --> UserRepo : OK
+        deactivate DB
+        UserRepo --> CreateSvc : void
+        deactivate UserRepo
+
+        CreateSvc --> BController : void
+        deactivate CreateSvc
+
+        BController --> Admin : 201 {message:\n"Barber created sDScessfully"}
+        deactivate BController
+    end
+end
+
+deactivate API
+
+|||
+
+== Parte 2: Configurar Disponibilidade Semanal ==
+
+loop Para cada dia da semana (ex: MONDAY a SATURDAY)
+
+    Admin -> API : POST /barbers/:barberShopIdOrSlug\n/barber/:barberId/availability\nHeaders: Authorization: Bearer <token>\nBody: {weekDay: "MONDAY",\nstartTime: "09:00", endTime: "18:00"}
+    activate API
+
+    API -> Auth : authMiddleware(req, res, next)
+    activate Auth
+    Auth --> API : next()
+    deactivate Auth
+
+    API -> AdminMW : adminMiddleware(req, res, next)
+    activate AdminMW
+    AdminMW --> API : next()
+    deactivate AdminMW
+
+    API -> BController : setAvailability(req, res)
+    activate BController
+
+    BController -> AvailSvc : execute({barberId,\nweekDay, startTime, endTime})
+    activate AvailSvc
+
+    alt #FFCCCC startTime >= endTime
+        AvailSvc --> Admin : 400 {message:\n"Start time must be\nbefore end time"}
+    else #CCFFCC Horários válidos
+
+        AvailSvc -> AvailRepo : findByBarberIdAndWeekDay(\nbarberId, weekDay)
+        activate AvailRepo
+        AvailRepo -> DB : SELECT * FROM "BarberAvailability"\nWHERE barber_id = ?\nAND week_day = ?
+        DB --> AvailRepo : BarberAvailability | null
+        AvailRepo --> AvailSvc : BarberAvailability | null
+        deactivate AvailRepo
+
+        opt Disponibilidade existente (sobrescrever)
+            AvailSvc -> AvailRepo : delete(existing.id)
+            activate AvailRepo
+            AvailRepo -> DB : DELETE FROM "BarberAvailability"\nWHERE id = ?
+            DB --> AvailRepo : OK
+            AvailRepo --> AvailSvc : void
+            deactivate AvailRepo
+        end
+
+        AvailSvc -> AvailRepo : create({barberId,\nweekDay, startTime, endTime})
+        activate AvailRepo
+        AvailRepo -> DB : INSERT INTO "BarberAvailability"\n(barber_id, week_day,\nstart_time, end_time)
+        DB --> AvailRepo : OK
+        AvailRepo --> AvailSvc : void
+        deactivate AvailRepo
+
+        AvailSvc --> BController : void
+        deactivate AvailSvc
+
+        BController --> Admin : 201 OK
+        deactivate BController
+    end
+
+    deactivate API
+
+end
+
+@enduml

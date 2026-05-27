@@ -1,0 +1,70 @@
+@startuml UC01_RegisterClient
+!theme plain
+
+title DS01 — Cadastro de Cliente (RF01)
+footer BarberHub — Diagrama de Sequência
+
+actor "Cliente" as Client
+participant "POST /auth/register" as Route
+control "UserController\n(registerClientHandle)" as Controller
+control "RegisterClientService" as Service
+entity "UserRepository" as Repo
+database "PostgreSQL" as DB
+
+autonumber
+
+Client -> Route : POST /auth/register\n{name, email, password,\nphone, birthDate}
+activate Route
+
+Route -> Controller : registerClientHandle(req, res)
+activate Controller
+
+Controller -> Controller : Zod parse(req.body)\nnote right: Validação com\nregisterClientSchema
+
+alt #FFCCCC Dados inválidos (ZodError)
+    Controller --> Client : 400 {message: "Erro de validação"}
+else #CCFFCC Dados válidos
+    Controller -> Service : execute({name, email,\npassword, phone,\nbirthDate, isActive: true})
+    activate Service
+
+    Service -> Repo : findByEmail(email)
+    activate Repo
+    Repo -> DB : SELECT * FROM "User"\nWHERE email = ?
+    activate DB
+    DB --> Repo : User | null
+    deactivate DB
+    Repo --> Service : User | null
+    deactivate Repo
+
+    alt #FFCCCC E-mail já registrado
+        Service --> Controller : throw AppError(\n"Email already registered", 400)
+        Controller --> Client : 400 {message:\n"Email already registered"}
+    else #CCFFCC E-mail disponível
+        Service -> Service : bcrypt.hash(password, 10)
+        note right: Senha criptografada\ncom 10 rounds (RNF12)
+
+        Service -> Repo : createClient({...data,\npassword: hashedPassword})
+        activate Repo
+        Repo -> DB : INSERT INTO "User" (...)\nINSERT INTO "Client" (...)
+        activate DB
+        note right of DB
+            Criação atômica:
+            1. User (role = CLIENT)
+            2. Client (phone, birthDate)
+        end note
+        DB --> Repo : OK
+        deactivate DB
+        Repo --> Service : void
+        deactivate Repo
+
+        Service --> Controller : void
+        deactivate Service
+
+        Controller --> Client : 201 {message:\n"Client registered successfully"}
+        deactivate Controller
+    end
+end
+
+deactivate Route
+
+@enduml
